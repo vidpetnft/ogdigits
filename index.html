@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+   <head>
+        <link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="https://ratemymoon.cat/img/icon.png">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        
+        <title>OG Digits Club</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="topbar">
+                 <div class="toptitle">
+                    <p>ogdigits.club by</p>
+                    <img src="img/twitter-logo.png" width="22px">
+                    <a href="https://twitter.com/vidpetnft" target="_blank">vidpet</a>
+                </div>
+                <div class="topnav">
+                    <a href="/categories">Links</a>
+                    <a class="active" href="/links">OG Digits</a>
+                </div>
+            </div>
+            <h1>OG Digits Club</h1>
+            <div class="digitlist">
+                <button type="button" onclick="loadDigitDB()">render</button>
+                <div class="digit">
+                    <div class="digit-id">#8</div>
+                    <div class="digit-name">0005555.eth</div>
+                    <div class="digit-price">2.99Ξ</div>
+                    <div class="digit-regdate">2017-05-16 0:08</div>
+                    <div class="digit-oslink">
+                        <a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/3203572911570314967565667253688271270753644949623297419129779255444557370380" target="_blank"><img src="img/os-logo.png" height="22px"></a>
+                    </div>
+                    <div class="digit-enslink">
+                        <a href="https://app.ens.domains/name/0005555.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a>
+                    </div> 
+                </div>
+                <div class="digit">
+                    <div class="digit-id">#53</div>
+                    <div class="digit-name">0000011.eth</div>
+                    <div class="digit-price">0.8Ξ</div>
+                    <div class="digit-regdate">2017-05-24 17:18</div>
+                    <div class="digit-oslink"><a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/26458156898877206253007968176455098591878054445914935376874290655869645830006" target="_blank"><img src="img/os-logo.png" height="22px"></a></div>
+                    <div class="digit-enslink"><a href="https://app.ens.domains/name/0000011.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a></div> 
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var digits;
+
+            function loadDigitDB(){
+                fetch("./digit-list.json")
+                .then(response => {
+                    return response.json();
+                })
+                .then(jsondata => console.log(jsondata));
+            }
+
+            function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
+                digitDiv = $("<div class=\"digit\">");
+                digitIdDiv = $("<div class=\"digit-id\">"+digitId+"</div>");
+                digitNameDiv = $("<div class=\"digit-name\">"+digitName+"</div>");
+                digitPriceDiv = $(" <div class=\"digit-price\">"+digitPrice+"</div>");
+                digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
+                digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
+                digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
+                digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitOSLinkDiv, digitENSLinkDiv);
+                $(".digitlist").append(digitDiv);
+            }
+        </script>
+
+
+    </body>
+</html>
