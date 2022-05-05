@@ -25,14 +25,14 @@
                 </div>
             </div>
             <h1>OG Digits Club</h1>
-            <h2>All the digits-only ENS names registered before CryptoPunks</h2>
+            <h2>All the digit ENS names registered before CryptoPunks</h2>
             <div class="digitlist">
-                <button type="button" onclick="loadDigitDB()">load</button>
+                <button type="button" onclick="loadDigitDBLocal()">load</button>
             </div>
         </div>
 
         <script>
-            function loadDigitDBLocal(){
+            function fetchDigitsLocal(){
                 const json = {
                    jsonData:  [
                       {
@@ -58,15 +58,38 @@
                     ]
                 }; 
 
-                render(json.jsonData);
+                fetchTokens(json.jsonData);
             }
 
-            function loadDigitDB(){
+            function fetchDigits(){
                 fetch("./digit-list.json")
                 .then(response => {
                     return response.json();
                 })
-                .then(jsonData => render(jsonData));
+                .then(jsonData => fetchTokens(jsonData));
+            }
+
+            function fetchTokens(jsonData){
+                const tokensAPI = "https://api.reservoir.tools/tokens/v4";
+
+                var parameters = "";
+/*                for (var key in jsonData){
+                    parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[key].name);
+                }*/
+
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[1].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[2].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[3].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[4].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[5].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[6].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[7].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[8].name);
+                parameters +="?tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[9].name);
+
+                fetch(tokensAPI+parameters)
+                    .then(response => response.json())
+                    .then(data => console.log(data));
             }
 
             function render(jsonData){
@@ -81,7 +104,7 @@
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
                 digitDiv = $("<div class=\"digit\">");
                 digitIdDiv = $("<div class=\"digit-id\">#"+digitId+"</div>");
-                digitNameDiv = $("<div class=\"digit-name\">"+digitName+"</div>");
+                digitNameDiv = $("<div class=\"digit-name\">"+digitName+".eth</div>");
                 digitPriceDiv = $(" <div class=\"digit-price\">"+digitPrice+"</div>");
                 digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
                 digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
