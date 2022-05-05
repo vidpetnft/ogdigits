@@ -20,7 +20,7 @@
                     <a href="https://twitter.com/vidpetnft" target="_blank">vidpet</a>
                 </div>
                 <div class="topnav">
-                    <a href="/categories">Links</a>
+                    <a href="/context">Context</a>
                     <a class="active" href="/links">OG Digits</a>
                 </div>
             </div>
@@ -100,12 +100,14 @@
                     parameters+=(parameters.length>0 ? "&" : "?");
                     parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(String(jsonData[key].name));
                     count++;
-                    if (count > 48) break;
+                    if (count > 48){
+                        fetch(tokensAPI+parameters)
+                            .then(response => response.json())
+                            .then(data => updateDigitPrices(data));
+                        count = 0;
+                        parameters = "";
+                    }
                 }
-
-                fetch(tokensAPI+parameters)
-                    .then(response => response.json())
-                    .then(data => updateDigitPrices(data));
             }
 
             function updateDigitPrices(data)
