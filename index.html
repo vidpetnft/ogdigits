@@ -24,7 +24,7 @@
             </div>
             <h1>OG Digits Club</h1>
             <div class="digitlist">
-                <button type="button" onclick="loadDigitDB()">render</button>
+                <button type="button" onclick="loadDigitDB()">load</button>
                 <div class="digit">
                     <div class="digit-id">#8</div>
                     <div class="digit-name">0005555.eth</div>
@@ -45,6 +45,14 @@
                     <div class="digit-oslink"><a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/26458156898877206253007968176455098591878054445914935376874290655869645830006" target="_blank"><img src="img/os-logo.png" height="22px"></a></div>
                     <div class="digit-enslink"><a href="https://app.ens.domains/name/0000011.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a></div> 
                 </div>
+                <div class="digit">
+                    <div class="digit-id">#85</div>
+                    <div class="digit-name">005302011.eth</div>
+                    <div class="digit-price">1.8Ξ</div>
+                    <div class="digit-regdate">2017-05-21 17:18</div>
+                    <div class="digit-oslink"><a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/26458156898877206253007968176455098591878054445914935376874290655869645830006" target="_blank"><img src="img/os-logo.png" height="22px"></a></div>
+                    <div class="digit-enslink"><a href="https://app.ens.domains/name/0000011.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a></div> 
+                </div>
             </div>
         </div>
 
@@ -56,7 +64,13 @@
                 .then(response => {
                     return response.json();
                 })
-                .then(jsondata => console.log(jsondata));
+                .then(jsonData => render(jsonData));
+            }
+
+            function render(jsonData){
+                for (var key in jsonData){
+                    console.log(key);
+                }
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
