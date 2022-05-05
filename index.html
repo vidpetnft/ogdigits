@@ -21,6 +21,11 @@
             </div>
             <h2>All the digit ENS names registered in 2017</h2>
             <div class="filterContainer">
+                <label class="filterLabel">7 Digits</label>
+                <label class="switch">
+                    <input type="checkbox" id="7-digits-filter" onclick="filterList()">
+                    <span class="slider round"></span>
+                </label>
                 <label class="filterLabel">Pre Punk:</label>
                 <label class="switch">
                     <input type="checkbox" id="pre-punk-filter" onclick="filterList()">
@@ -174,6 +179,9 @@
                 var count = 0;
                 for (var nameHash in digits){
                     var digitVisible = true;
+                    if ($("#7-digits-filter").is(":checked") && String(digits[nameHash].name).length>7){
+                        digitVisible = false;
+                    }
                     if ($("#pre-punk-filter").is(":checked") && digits[nameHash].id>PRE_PUNK_CUT_OFF){
                         digitVisible = false;
                     }
