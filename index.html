@@ -58,7 +58,7 @@
                     ]
                 }; 
 
-                fetchTokens(json.jsonData);
+                render(json.jsonData);
             }
 
             function fetchDigits(){
@@ -95,13 +95,14 @@
                 var tokenIdsCsv = "";
                 for (var key in jsonData){
                     const digitPrice = "-";
-                    const digitHash = getDigitHash(jsonData[key].name);
+                    const digitName = String(jsonData[key].name);
+                    const digitHash = getDigitHash(digitName);
                     
                     tokenIdsCsv += digitHash + ",";
 
                     const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
                     const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
-                    renderDigit(jsonData[key].id, jsonData[key].name, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
+                    renderDigit(jsonData[key].id, digitName, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
                 }
                 console.log(tokenIdsCsv);
             }
