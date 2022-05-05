@@ -13,19 +13,31 @@
     </head>
     <body onload="loadDigits();">
         <div class="container">
-            <div class="topbar">
-                 <div class="toptitle">
-                    <p>ogdigits.club by</p>
-                    <img src="img/twitter-logo.png" width="22px">
-                    <a href="https://twitter.com/vidpetnft" target="_blank">vidpet</a>
-                </div>
-                <div class="topnav">
-                    <a href="/context">Context</a>
-                    <a class="active" href="/links">OG Digits</a>
-                </div>
+            <div class="toptitle">
+                <h1>OG Digits Club</h1>
+                <a href="https://twitter.com/vidpetnft" target="_blank">vidpet</a>
+                <img src="img/twitter-logo.png" width="22px">
+                <p>by</p>
             </div>
-            <h1>OG Digits Club</h1>
             <h2>All the digit ENS names registered in 2017</h2>
+            <div class="filterContainer">
+                <label class="filterLabel">Pre Punk:</label>
+                <label class="switch">
+                    <input type="checkbox" id="pre-punk-filter" onclick="filterList()">
+                    <span class="slider round"></span>
+                </label>
+                <label class="filterLabel">Buy Now:</label>
+                <label class="switch">
+                    <input type="checkbox" id="buy-now-filter" onclick="filterList()">
+                    <span class="slider round"></span>
+                </label>
+                <label class="filterLabel">Available:</label>
+                <label class="switch">
+                    <input type="checkbox" id="available-filter" onclick="filterList()">
+                    <span class="slider round"></span>
+                </label>
+                <div class="listLengthInfo">0 Item</div>
+            </div>
             <div class="digitlist">
             </div>
         </div>
@@ -34,7 +46,7 @@
             //localStorage.clear();
             var localTest = false;
 
-            const CACHE_INVALIDATION_TIME = 20*1000;
+            const CACHE_INVALIDATION_TIME = 300*1000;
             var digits;
 
             function loadDigits(){
@@ -76,6 +88,8 @@
                 for (var nameHash in digits){
                     renderDigit(digits[nameHash].id, String(digits[nameHash].name), digits[nameHash].price, digits[nameHash].regdate, nameHash);
                 }
+
+                updateListLengthInfo(Object.keys(digits).length);
 
                 fetchTokenPrices();
             }
@@ -147,10 +161,40 @@
                 localStorage.digits = JSON.stringify(digits);
             }
 
+            function filterList(){
+                var count = 0;
+                for (var nameHash in digits){
+                    var digitVisible = true;
+                    if ($("#pre-punk-filter").is(":checked") && digits[nameHash].id>226){
+                        digitVisible = false;
+                    }
+                    if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0){
+                        digitVisible = false;
+                    }
+                    if ($("#available-filter").is(":checked") && digits[nameHash].price>=0){
+                        digitVisible = false;
+                    }
+
+                    if (digitVisible){
+                        $("#"+nameHash).show();
+                        count++;
+                    }
+                    else{
+                        $("#"+nameHash).hide();
+                    }
+                }
+
+                updateListLengthInfo(count);
+            }
+
             function getDigitHash(digitName){
                 const labelHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(digitName));
                 const tokenId = ethers.BigNumber.from(labelHash).toString();
                 return tokenId;
+            }
+
+            function updateListLengthInfo(length){
+                $(".listLengthInfo").text(length+" Items");
             }
 
             function getCellColor(digitPrice){
