@@ -53,6 +53,11 @@
                         "id": 8,
                         "name": "0005555",
                         "regdate": "2017-05-16 0:08"
+                      },
+                        {
+                        "id": 431,
+                        "name": 5555558,
+                        "regdate": "2017-06-24 3:13"
                       }
                     ]
                 }; 
@@ -74,7 +79,7 @@
                     renderDigit(jsonData[key].id, digitName, digitPrice, jsonData[key].regdate, digitHash);
                 }
 
-                //fetchTokenPrices(jsonData);
+                fetchTokenPrices(jsonData);
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitHash){
@@ -82,8 +87,8 @@
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
                 digitDiv = $("<div class=\"digit\">");
                 digitIdDiv = $("<div class=\"digit-id\">#"+digitId+"</div>");
-                digitNameDiv = $("<div class=\"digit-name\">"+digitName+".eth</div>");
-                digitPriceDiv = $(" <div class=\"digit-price\" id=\""+digitHash+"\">"+digitPrice+"</div>");
+                digitNameDiv = $("<div class=\"digit-name\" id=\"digitName"+digitHash+"\">"+digitName+".eth</div>");
+                digitPriceDiv = $(" <div class=\"digit-price\" id=\"digitPrice"+digitHash+"\">"+digitPrice+"</div>");
                 digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
                 digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
                 digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
@@ -108,14 +113,23 @@
                         parameters = "";
                     }
                 }
+                if (count > 0){
+                    fetch(tokensAPI+parameters)
+                        .then(response => response.json())
+                        .then(data => updateDigitPrices(data));
+                }
             }
 
             function updateDigitPrices(data)
             {
                 for (var key in data.tokens)
                 {
-                    if (data.tokens[key].floorAskPrice != null){
-                        $("#"+data.tokens[key].tokenId).text(data.tokens[key].floorAskPrice+"Ξ");
+                    if (data.tokens[key].name == null){
+                        $("#digitName"+data.tokens[key].tokenId).css("background-color", "#b8e6c2");
+                    }
+                    else if (data.tokens[key].floorAskPrice != null){
+                        $("#digitName"+data.tokens[key].tokenId).css("background-color", "#a5c8ec");
+                        $("#digitPrice"+data.tokens[key].tokenId).text(data.tokens[key].floorAskPrice+"Ξ");
                     }
                 }
 
