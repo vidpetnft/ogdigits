@@ -92,18 +92,18 @@
             }
 
             function render(jsonData){
-                let csvContent = "data:text/csv;charset=utf-8,";
+                var tokenIdsCsv = "";
                 for (var key in jsonData){
                     const digitPrice = "-";
                     const digitHash = getDigitHash(jsonData[key].name);
                     
-                    csvContent += digitHash + ",";
+                    tokenIdsCsv += digitHash + ",";
 
                     const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
                     const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
                     renderDigit(jsonData[key].id, jsonData[key].name, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
                 }
-                console.log(csvContent);
+                console.log(tokenIdsCsv);
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
