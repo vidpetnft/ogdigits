@@ -1,1 +1,1 @@
-# ratemymoon.cat
+# ogdigits.club
