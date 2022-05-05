@@ -25,7 +25,7 @@
                 </div>
             </div>
             <h1>OG Digits Club</h1>
-            <h2>All the digit ENS names registered before CryptoPunks</h2>
+            <h2>All the digit ENS names registered in 2017</h2>
             <div class="digitlist">
                 <button type="button" onclick="fetchDigits()">load</button>
             </div>
@@ -62,7 +62,7 @@
             }
 
             function fetchDigits(){
-                fetch("./digit-list.json")
+                fetch("./2017digits.json")
                 .then(response => {
                     return response.json();
                 })
@@ -92,14 +92,19 @@
             }
 
             function render(jsonData){
+                let csvContent = "data:text/csv;charset=utf-8,";
                 for (var key in jsonData){
                     const digitPrice = "-";
                     const digitHash = getDigitHash(jsonData[key].name);
-                    console.log(digitHash);
+                    
+                    csvContent += digitHash + ",";
+
                     const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
                     const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
                     renderDigit(jsonData[key].id, jsonData[key].name, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
                 }
+                var encodedUri = encodeURI(csvContent);
+                window.open(encodedUri);
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
