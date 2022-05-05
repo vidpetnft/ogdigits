@@ -103,8 +103,7 @@
                     const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
                     renderDigit(jsonData[key].id, jsonData[key].name, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
                 }
-                var encodedUri = encodeURI(csvContent);
-                window.open(encodedUri);
+                console.log(csvContent);
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
