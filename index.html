@@ -43,14 +43,21 @@
         </div>
 
         <script>
-            localStorage.clear();
-            var localTest = false;
-
+            const LOCAL_TEST = false;
+            const LOCAL_STORAGE_VERSION = 1;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
+
             var digits;
 
             function loadDigits(){
+
+                if (localStorage.version == null || localStorage.version < LOCAL_STORAGE_VERSION){
+                    localStorage.clear();
+                    console.log("localStorage cleared");
+                    localStorage.version = LOCAL_STORAGE_VERSION;
+                }
+
                 if (localStorage.digits == null){
                     fetchDigits();
                 }
@@ -61,7 +68,7 @@
             }
 
             function fetchDigits(){
-                if (localTest){
+                if (LOCAL_TEST){
                     storeDigits(testJson.jsonData);
                 }
                 else{
