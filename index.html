@@ -31,7 +31,7 @@
         </div>
 
         <script>
-            //localStorage.clear();
+            localStorage.clear();
             var localTest = false;
 
             const CACHE_INVALIDATION_TIME = 20*1000;
@@ -49,21 +49,21 @@
 
             function fetchDigits(){
                 if (localTest){
-                    storeDigits(testJson);
+                    storeDigits(testJson.jsonData);
                 }
                 else{
                     fetch("./2017digits.json")
                     .then(response => response.json())
-                    .then(data => storeDigits(data));
+                    .then(jsonData => storeDigits(jsonData));
                 }
             }
 
-            function storeDigits(data){
+            function storeDigits(jsonData){
                 digits = new Object();
 
-                for (var key in data.jsonData){
-                    var digitNameHash = getDigitHash(String(data.jsonData[key].name));
-                    digits[digitNameHash] = data.jsonData[key];
+                for (var key in jsonData){
+                    var digitNameHash = getDigitHash(String(jsonData[key].name));
+                    digits[digitNameHash] = jsonData[key];
                 }
 
                 localStorage.pricesUpdatedAt = -1;
