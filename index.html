@@ -47,6 +47,7 @@
             var localTest = false;
 
             const CACHE_INVALIDATION_TIME = 300*1000;
+            const PRE_PUNK_CUT_OFF = 424;
             var digits;
 
             function loadDigits(){
@@ -76,6 +77,7 @@
                 for (var key in jsonData){
                     var digitNameHash = getDigitHash(String(jsonData[key].name));
                     digits[digitNameHash] = jsonData[key];
+                    digits[digitNameHash].price = 0;
                 }
 
                 localStorage.pricesUpdatedAt = -1;
@@ -165,7 +167,7 @@
                 var count = 0;
                 for (var nameHash in digits){
                     var digitVisible = true;
-                    if ($("#pre-punk-filter").is(":checked") && digits[nameHash].id>226){
+                    if ($("#pre-punk-filter").is(":checked") && digits[nameHash].id>PRE_PUNK_CUT_OFF){
                         digitVisible = false;
                     }
                     if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0){
