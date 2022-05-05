@@ -31,7 +31,7 @@
         </div>
 
         <script>
-            localStorage.clear();
+            //localStorage.clear();
             var localTest = false;
 
             const CACHE_INVALIDATION_TIME = 20*1000;
@@ -98,7 +98,6 @@
 
             function fetchTokenPrices(){
                 if (Date.now() - localStorage.pricesUpdatedAt > CACHE_INVALIDATION_TIME){
-                    console.log("fetching tokens");
                     const tokensAPI = "https://api.reservoir.tools/tokens/v4";
 
                     var parameters = "";
@@ -140,8 +139,6 @@
                         digits[nameHash].price = 0;
                     }
 
-                    console.log("hash: "+nameHash+", price: "+digits[nameHash].price);
-
                     $("#"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
                     $("#"+nameHash+" > .digit-price").text(getPriceLabel(digits[nameHash].price));
                 }
@@ -158,10 +155,10 @@
 
             function getCellColor(digitPrice){
                 var cellColor = "#ffffff";
-                if (digitPrice > 0){
+                if (digitPrice < 0){
                     cellColor = "#b8e6c2";
                 }
-                else if (digitPrice < 0){
+                else if (digitPrice > 0){
                     cellColor = "#a5c8ec";
                 }
                 return cellColor;
