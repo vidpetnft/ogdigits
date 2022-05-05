@@ -81,8 +81,10 @@ body {
 }
 
 .digit-name {
+    text-align: right;
     background-color: white;
     color:black;
+    padding-right: 5px;
 }
 
 .digit-price {

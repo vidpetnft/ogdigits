@@ -3,7 +3,7 @@
    <head>
         <link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
         <link rel="stylesheet" href="style.css">
-        <link rel="icon" href="https://ratemymoon.cat/img/icon.png">
+        <link rel="icon" href="img/icon.png">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         
@@ -57,7 +57,29 @@
         </div>
 
         <script>
-            var digits;
+            function loadDigitDBTest(){
+                const json = {
+                   jsonData:  [
+                      {
+                        "id": 1,
+                        "name": 31415926535897932,
+                        "regdate": "2017-05-10 7:21"
+                      },
+                      {
+                        "id": 2,
+                        "name": 6888888,
+                        "regdate": "2017-05-11 20:12"
+                      },
+                      {
+                        "id": 3,
+                        "name": 6668888,
+                        "regdate": "2017-05-14 14:09"
+                      }
+                    ]
+                }; 
+
+                render(json.jsonData);
+            }
 
             function loadDigitDB(){
                 fetch("./digit-list.json")
@@ -69,13 +91,13 @@
 
             function render(jsonData){
                 for (var key in jsonData){
-                    console.log(key);
+                    renderDigit(jsonData[key].id, jsonData[key].name, "-", jsonData[key].regdate);
                 }
             }
 
             function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
                 digitDiv = $("<div class=\"digit\">");
-                digitIdDiv = $("<div class=\"digit-id\">"+digitId+"</div>");
+                digitIdDiv = $("<div class=\"digit-id\">#"+digitId+"</div>");
                 digitNameDiv = $("<div class=\"digit-name\">"+digitName+"</div>");
                 digitPriceDiv = $(" <div class=\"digit-price\">"+digitPrice+"</div>");
                 digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
