@@ -5,7 +5,9 @@
         <link rel="stylesheet" href="style.css">
         <link rel="icon" href="img/icon.png">
 
+        <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js" integrity="sha512-PmGDkK2UHGzTUfkFGcJ8YSrD/swUXekcca+1wWlrwALIZho9JX+3ddaaI9wmmf8PmgDIpMtx6TU8YBJAZS0mPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         
         <title>OG Digits Club</title>
     </head>
@@ -23,41 +25,14 @@
                 </div>
             </div>
             <h1>OG Digits Club</h1>
+            <h2>All the digits-only ENS names registered before CryptoPunks</h2>
             <div class="digitlist">
                 <button type="button" onclick="loadDigitDB()">load</button>
-                <div class="digit">
-                    <div class="digit-id">#8</div>
-                    <div class="digit-name">0005555.eth</div>
-                    <div class="digit-price">2.99Ξ</div>
-                    <div class="digit-regdate">2017-05-16 0:08</div>
-                    <div class="digit-oslink">
-                        <a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/3203572911570314967565667253688271270753644949623297419129779255444557370380" target="_blank"><img src="img/os-logo.png" height="22px"></a>
-                    </div>
-                    <div class="digit-enslink">
-                        <a href="https://app.ens.domains/name/0005555.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a>
-                    </div> 
-                </div>
-                <div class="digit">
-                    <div class="digit-id">#53</div>
-                    <div class="digit-name">0000011.eth</div>
-                    <div class="digit-price">0.8Ξ</div>
-                    <div class="digit-regdate">2017-05-24 17:18</div>
-                    <div class="digit-oslink"><a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/26458156898877206253007968176455098591878054445914935376874290655869645830006" target="_blank"><img src="img/os-logo.png" height="22px"></a></div>
-                    <div class="digit-enslink"><a href="https://app.ens.domains/name/0000011.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a></div> 
-                </div>
-                <div class="digit">
-                    <div class="digit-id">#85</div>
-                    <div class="digit-name">005302011.eth</div>
-                    <div class="digit-price">1.8Ξ</div>
-                    <div class="digit-regdate">2017-05-21 17:18</div>
-                    <div class="digit-oslink"><a href="https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/26458156898877206253007968176455098591878054445914935376874290655869645830006" target="_blank"><img src="img/os-logo.png" height="22px"></a></div>
-                    <div class="digit-enslink"><a href="https://app.ens.domains/name/0000011.eth/details" target="_blank"><img src="img/ens-logo.png" height="22px"></a></div> 
-                </div>
             </div>
         </div>
 
         <script>
-            function loadDigitDBTest(){
+            function loadDigitDBLocal(){
                 const json = {
                    jsonData:  [
                       {
@@ -74,6 +49,11 @@
                         "id": 3,
                         "name": 6668888,
                         "regdate": "2017-05-14 14:09"
+                      },
+                      {
+                        "id": 8,
+                        "name": "0005555",
+                        "regdate": "2017-05-16 0:08"
                       }
                     ]
                 }; 
@@ -91,7 +71,10 @@
 
             function render(jsonData){
                 for (var key in jsonData){
-                    renderDigit(jsonData[key].id, jsonData[key].name, "-", jsonData[key].regdate);
+                    const digitPrice = "-";
+                    const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+getDigitHash(jsonData[key].name);
+                    const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
+                    renderDigit(jsonData[key].id, jsonData[key].name, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
                 }
             }
 
@@ -106,6 +89,13 @@
                 digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitOSLinkDiv, digitENSLinkDiv);
                 $(".digitlist").append(digitDiv);
             }
+
+            function getDigitHash(digitName){
+                const labelHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(digitName));
+                const tokenId = ethers.BigNumber.from(labelHash).toString();
+                return tokenId;
+            }
+
         </script>
 
 
