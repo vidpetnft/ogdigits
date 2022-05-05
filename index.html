@@ -11,7 +11,7 @@
         
         <title>OG Digits Club</title>
     </head>
-    <body>
+    <body onload="fetchDigitsLocal();">
         <div class="container">
             <div class="topbar">
                  <div class="toptitle">
@@ -27,12 +27,11 @@
             <h1>OG Digits Club</h1>
             <h2>All the digit ENS names registered in 2017</h2>
             <div class="digitlist">
-                <button type="button" onclick="fetchDigits()">load</button>
             </div>
         </div>
 
         <script>
-            function fetchDigitsLocal(){
+            function fetchDigits(){
                 const json = {
                    jsonData:  [
                       {
