@@ -27,7 +27,7 @@
             <h1>OG Digits Club</h1>
             <h2>All the digit ENS names registered in 2017</h2>
             <div class="digitlist">
-                <button type="button" onclick="fetchDigits()">load</button>
+                <button type="button" onclick="fetchDigitsLocal()">load</button>
             </div>
         </div>
 
@@ -63,60 +63,61 @@
 
             function fetchDigits(){
                 fetch("./2017digits.json")
-                .then(response => {
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(jsonData => render(jsonData));
             }
 
-            function fetchTokens(jsonData){
-                const tokensAPI = "https://api.reservoir.tools/tokens/v4";
-
-                var parameters = "";
-                for (var key in jsonData){
-                    if (parameters.length > 0){
-                        parameters+="&";
-                    }
-                    else{
-                        parameters+="?"
-                    }
-
-                    parameters +="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(jsonData[key].name);
-                }
-
-                console.log(tokensAPI+parameters);
-
-                fetch(tokensAPI+parameters)
-                    .then(response => response.json())
-                    .then(data => console.log(data));
-            }
-
             function render(jsonData){
-                var tokenIdsCsv = "";
                 for (var key in jsonData){
                     const digitPrice = "-";
                     const digitName = String(jsonData[key].name);
                     const digitHash = getDigitHash(digitName);
-                    
-                    tokenIdsCsv += digitHash + ",";
-
-                    const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
-                    const digitENSLink = "https://app.ens.domains/name/"+jsonData[key].name+".eth/details";
-                    renderDigit(jsonData[key].id, digitName, digitPrice, jsonData[key].regdate, digitOSLink, digitENSLink);
+                    renderDigit(jsonData[key].id, digitName, digitPrice, jsonData[key].regdate, digitHash);
                 }
-                console.log(tokenIdsCsv);
+
+                fetchTokenPrices(jsonData);
             }
 
-            function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitOSLink, digitENSLink){
+            function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitHash){
+                const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
+                const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
                 digitDiv = $("<div class=\"digit\">");
                 digitIdDiv = $("<div class=\"digit-id\">#"+digitId+"</div>");
                 digitNameDiv = $("<div class=\"digit-name\">"+digitName+".eth</div>");
-                digitPriceDiv = $(" <div class=\"digit-price\">"+digitPrice+"</div>");
+                digitPriceDiv = $(" <div class=\"digit-price\" id=\""+digitHash+"\">"+digitPrice+"</div>");
                 digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
                 digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
                 digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
                 digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitOSLinkDiv, digitENSLinkDiv);
                 $(".digitlist").append(digitDiv);
+            }
+
+            function fetchTokenPrices(jsonData){
+                const tokensAPI = "https://api.reservoir.tools/tokens/v4";
+
+                var parameters = "";
+                var count = 0;
+                for (var key in jsonData){
+                    parameters+=(parameters.length>0 ? "&" : "?");
+                    parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+getDigitHash(String(jsonData[key].name));
+                    count++;
+                    if (count > 48) break;
+                }
+
+                fetch(tokensAPI+parameters)
+                    .then(response => response.json())
+                    .then(data => updateDigitPrices(data));
+            }
+
+            function updateDigitPrices(data)
+            {
+                for (var key in data.tokens)
+                {
+                    if (data.tokens[key].floorAskPrice != null){
+                        $("#"+data.tokens[key].tokenId).text(data.tokens[key].floorAskPrice+"Ξ");
+                    }
+                }
+
             }
 
             function getDigitHash(digitName){
