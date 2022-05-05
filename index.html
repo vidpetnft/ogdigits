@@ -43,7 +43,7 @@
         </div>
 
         <script>
-            localStorage.clear();
+            //localStorage.clear();
             var localTest = false;
 
             const CACHE_INVALIDATION_TIME = 300*1000;
@@ -176,8 +176,6 @@
                     if ($("#available-filter").is(":checked") && digits[nameHash].price>=0){
                         digitVisible = false;
                     }
-
-                    console.log("id:"+digits[nameHash].id+",price:"+digits[nameHash].price+",visible:"+digitVisible);
 
                     if (digitVisible){
                         $("#"+nameHash).show();
