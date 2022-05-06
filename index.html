@@ -135,6 +135,7 @@
                         parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+(nameHash);
                         count++;
                         if (count > 48){
+                            console.log("fetching tokens: "+tokensAPI+parameters);
                             fetch(tokensAPI+parameters)
                                 .then(response => response.json())
                                 .then(data => updateDigits(data));
@@ -153,6 +154,7 @@
 
             function updateDigits(data)
             {
+                console.log("fetch response: "+data);
                 for (var key in data.tokens)
                 {
                     const nameHash = data.tokens[key].tokenId;
@@ -249,14 +251,14 @@
                             "regdate": "2017-05-11 20:12"
                           },
                           {
-                            "id": 3,
-                            "name": 6668888,
-                            "regdate": "2017-05-14 14:09"
-                          },
-                          {
                             "id": 8,
                             "name": "0005555",
                             "regdate": "2017-05-16 0:08"
+                          },
+                          {
+                            "id": 280,
+                            "name": "0988888",
+                            "regdate": "2017-06-12 6:42"
                           },
                             {
                             "id": 431,
