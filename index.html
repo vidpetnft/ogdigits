@@ -49,7 +49,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 4;
+            const LOCAL_STORAGE_VERSION = 8;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
 
@@ -130,21 +130,24 @@
 
                     var parameters = "";
                     var count = 0;
+                    var tokenlist = "";
+
+                    console.log("fetching tokens");
                     for (var nameHash in digits){
                         parameters+=(parameters.length>0 ? "&" : "?");
                         parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+(nameHash);
                         count++;
-                        if (count > 48){
-                            console.log("fetching tokens: "+tokensAPI+parameters);
+                        tokenlist+=digits[nameHash].id+",";
+                        if (count >= 20){
                             fetch(tokensAPI+parameters)
                                 .then(response => response.json())
                                 .then(data => updateDigits(data));
                             count = 0;
                             parameters = "";
+                            tokenlist = "";
                         }
                     }
                     if (count > 0){
-                        console.log("fetching tokens: "+tokensAPI+parameters);
                         fetch(tokensAPI+parameters)
                             .then(response => response.json())
                             .then(data => updateDigits(data));
@@ -154,12 +157,9 @@
 
             function updateDigits(data)
             {
-                console.log("fetch response: "+data);
                 for (var key in data.tokens)
                 {
                     const nameHash = data.tokens[key].tokenId;
-
-                    var oldPrice = digits[nameHash].price;
 
                     if (data.tokens[key].floorAskPrice != null){
                         digits[nameHash].price = data.tokens[key].floorAskPrice;
@@ -169,11 +169,6 @@
                     }
                     else{
                         digits[nameHash].price = 0;
-                    }
-
-                    var newPrice = digits[nameHash].price;
-                    if (oldPrice != newPrice){
-                        console.log("price change: "+digits[nameHash].id+", old: "+oldPrice+", new: "+newPrice);
                     }
 
                     $("#"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
@@ -260,14 +255,18 @@
                             "name": "0988888",
                             "regdate": "2017-06-12 6:42"
                           },
-                            {
+                          {
                             "id": 431,
                             "name": 5555558,
                             "regdate": "2017-06-24 3:13"
+                          },
+                          {
+                            "id": 576,
+                            "name": "0000520",
+                            "regdate": "2017-07-06 15:05"
                           }
                         ]
-                    };  
-
+                    };
         </script>
 
 
