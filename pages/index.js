@@ -73,7 +73,7 @@ const DigitRow = ({
       <div className="digit-id">#{digitId}</div>
       <div
         className="digit-name"
-        style={`background-color: ${getCellColor(digitPrice)}`}
+        //   style={`background-color: ${getCellColor(digitPrice)}`}
       >
         {`${digitName} .eth`}
       </div>
@@ -93,7 +93,7 @@ const DigitRow = ({
   );
 };
 
-const fetchTokenPrices = async () => {
+const fetchTokenPrices = async (digits) => {
   const tokensAPI = "https://api.reservoir.tools/tokens/v4";
 
   console.log("fetching tokens");
@@ -109,17 +109,19 @@ const fetchTokenPrices = async () => {
   const requests = [];
 
   for (const chunk of chunks) {
+    const request = `${tokensAPI}`;
     for (let i = 0; i < chunk.length; i++) {
       const symbol = i === 0 ? "?" : "&";
-      requests.push(
-        `${tokensAPI}${symbol}tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:${chunk[i]}`
-      );
+      request += `${symbol}tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:${chunk[i]}`;
     }
+    requests.push(request);
   }
 
   const results = await Promise.all(
     requests.map(async (request) => {
-      const res = await fetch(request);
+      const res = await fetch(request, {
+        mode: "no-cors",
+      });
       return await res.json();
     })
   );
@@ -217,11 +219,14 @@ const testJson = {
 };
 export default function Home() {
   const [digits, setDigits] = useState({});
+  const [priceQueried, setPriceQueried] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (Object.keys(digits).length === 0) {
+        console.log("loadDigits 1");
         const result = await loadDigits();
+        console.log("loadDigits 2");
         setDigits(result);
       }
     };
@@ -231,30 +236,36 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (Object.keys(digits).length > 0) {
-        const data = fetchTokenPrices();
+      if (Object.keys(digits).length > 0 && !priceQueried) {
+        const digitsCopy = JSON.parse(JSON.stringify(digits));
+        console.log("fetchTokenPrices", 1);
+        const data = fetchTokenPrices(digits);
+        console.log("fetchTokenPrices", 2);
         for (const key in data.tokens) {
           const nameHash = data.tokens[key].tokenId;
 
           if (data.tokens[key].floorAskPrice != null) {
-            digits[nameHash].price = data.tokens[key].floorAskPrice;
+            digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
           } else if (data.tokens[key].name == null) {
-            digits[nameHash].price = -1;
+            digitsCopy[nameHash].price = -1;
           } else {
-            digits[nameHash].price = 0;
+            digitsCopy[nameHash].price = 0;
           }
         }
+        setDigits(digitsCopy);
+        setPriceQueried(true);
         //    localStorage.pricesUpdatedAt = Date.now();
       }
     };
 
     fetchData();
-  }, []);
+  }, [digits]);
 
   // useEffect(() => {
   //   localStorage.digits = JSON.stringify(digits);
   // }, [digits]);
 
+  console.log("render", digits);
   return (
     <div className="container">
       <Head>
@@ -338,13 +349,6 @@ export default function Home() {
       </footer>
 
       <style jsx>{`
-        * {
-          margin: 0;
-          padding: 0;
-        }
-        html {
-          background-color: black;
-        }
         body {
           background-color: black;
           font-family: "Open Sans";
@@ -524,6 +528,7 @@ export default function Home() {
           font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
             Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
             sans-serif;
+          background-color: black;
         }
 
         * {
