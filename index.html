@@ -45,11 +45,6 @@
                     <input type="checkbox" id="buy-now-filter" onclick="filterList()">
                     <span class="slider round"></span>
                 </label>
-                <label class="filterLabel">Available:</label>
-                <label class="switch">
-                    <input type="checkbox" id="available-filter" onclick="filterList()">
-                    <span class="slider round"></span>
-                </label>
                 <div class="listLengthInfo">0 Item</div>
             </div>
             <div class="digitlist">
@@ -57,7 +52,7 @@
         </div>
 
         <script>
-            const LOCAL_TEST = false;
+            const LOCAL_TEST = true;
             const LOCAL_STORAGE_VERSION = 9;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
@@ -201,9 +196,6 @@
                     if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0){
                         digitVisible = false;
                     }
-                    if ($("#available-filter").is(":checked") && digits[nameHash].price>=0){
-                        digitVisible = false;
-                    }
 
                     if (digitVisible){
                         $("#"+nameHash).show();
@@ -229,10 +221,7 @@
 
             function getCellColor(digitPrice){
                 var cellColor = "#ffffff";
-                if (digitPrice < 0){
-                    cellColor = "#b8e6c2";
-                }
-                else if (digitPrice > 0){
+                if (digitPrice > 0){
                     cellColor = "#a5c8ec";
                 }
                 return cellColor;
