@@ -52,6 +52,13 @@ body {
     font-weight: normal;
 }
 
+.footer {
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    padding-top: 30px;
+}
+
 .digitlist {
     color: white;
     font-size: 17px;
