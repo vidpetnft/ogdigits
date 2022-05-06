@@ -49,7 +49,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 2;
+            const LOCAL_STORAGE_VERSION = 3;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
 
@@ -157,6 +157,8 @@
                 {
                     const nameHash = data.tokens[key].tokenId;
 
+                    var oldPrice = digits[nameHash].price;
+
                     if (data.tokens[key].floorAskPrice != null){
                         digits[nameHash].price = data.tokens[key].floorAskPrice;
                     }
@@ -165,6 +167,11 @@
                     }
                     else{
                         digits[nameHash].price = 0;
+                    }
+
+                    var newPrice = digits[nameHash].price;
+                    if (oldPrice != newPrice){
+                        console.log("price change: "+digits[nameHash].id+", old: "+oldPrice+", new: "+newPrice);
                     }
 
                     $("#"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
