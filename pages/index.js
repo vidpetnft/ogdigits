@@ -73,7 +73,9 @@ const DigitRow = ({
       <div className="digit-id">#{digitId}</div>
       <div
         className="digit-name"
-        //   style={`background-color: ${getCellColor(digitPrice)}`}
+        style={{
+          backgroundColor: getCellColor(digitPrice),
+        }}
       >
         {`${digitName} .eth`}
       </div>
@@ -234,32 +236,32 @@ export default function Home() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (Object.keys(digits).length > 0 && !priceQueried) {
-        const digitsCopy = JSON.parse(JSON.stringify(digits));
-        console.log("fetchTokenPrices", 1);
-        const data = fetchTokenPrices(digits);
-        console.log("fetchTokenPrices", 2);
-        for (const key in data.tokens) {
-          const nameHash = data.tokens[key].tokenId;
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (Object.keys(digits).length > 0 && !priceQueried) {
+  //       const digitsCopy = JSON.parse(JSON.stringify(digits));
+  //       console.log("fetchTokenPrices", 1);
+  //       const data = fetchTokenPrices(digits);
+  //       console.log("fetchTokenPrices", 2);
+  //       for (const key in data.tokens) {
+  //         const nameHash = data.tokens[key].tokenId;
 
-          if (data.tokens[key].floorAskPrice != null) {
-            digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
-          } else if (data.tokens[key].name == null) {
-            digitsCopy[nameHash].price = -1;
-          } else {
-            digitsCopy[nameHash].price = 0;
-          }
-        }
-        setDigits(digitsCopy);
-        setPriceQueried(true);
-        //    localStorage.pricesUpdatedAt = Date.now();
-      }
-    };
+  //         if (data.tokens[key].floorAskPrice != null) {
+  //           digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
+  //         } else if (data.tokens[key].name == null) {
+  //           digitsCopy[nameHash].price = -1;
+  //         } else {
+  //           digitsCopy[nameHash].price = 0;
+  //         }
+  //       }
+  //       setDigits(digitsCopy);
+  //       setPriceQueried(true);
+  //       //    localStorage.pricesUpdatedAt = Date.now();
+  //     }
+  //   };
 
-    fetchData();
-  }, [digits]);
+  //   fetchData();
+  // }, [digits]);
 
   // useEffect(() => {
   //   localStorage.digits = JSON.stringify(digits);
