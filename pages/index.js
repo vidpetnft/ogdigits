@@ -1,3 +1,4 @@
+import { BigNumber, utils } from "ethers";
 import { namehash } from "ethers/lib/utils";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -8,35 +9,41 @@ const CACHE_INVALIDATION_TIME = 300 * 1000;
 const PRE_PUNK_CUT_OFF = 424;
 
 const loadDigits = async () => {
-  if (
-    localStorage.version == null ||
-    localStorage.version < LOCAL_STORAGE_VERSION
-  ) {
-    localStorage.clear();
-    console.log("localStorage cleared");
-    localStorage.version = LOCAL_STORAGE_VERSION;
-  }
+  // if (
+  //   localStorage.version == null ||
+  //   localStorage.version < LOCAL_STORAGE_VERSION
+  // ) {
+  //   localStorage.clear();
+  //   console.log("localStorage cleared");
+  //   localStorage.version = LOCAL_STORAGE_VERSION;
+  // }
 
-  if (localStorage.digits == null) {
-    return await fetchDigits();
-  } else {
-    return JSON.parse(localStorage.digits);
-  }
+  return await fetchDigits();
+  // if (localStorage.digits == null) {
+  //   return await fetchDigits();
+  // } else {
+  //   return JSON.parse(localStorage.digits);
+  // }
 };
 
 const fetchDigits = async () => {
   // if (LOCAL_TEST) {
   //   storeDigits(testJson.jsonData);
   // } else {
-  const response = await fetch("../data/2017digits.json");
+  const response = await fetch("./2017digits.json", {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
   const data = await response.json();
-  const digits = storeDigits();
+  const digits = storeDigits(data);
   return digits;
   // }
 };
 
 function storeDigits(jsonData) {
-  digits = new Object();
+  const digits = new Object();
 
   for (var key in jsonData) {
     var digitNameHash = getDigitHash(String(jsonData[key].name));
@@ -56,6 +63,11 @@ const DigitRow = ({
   digitRegDate,
   digitHash,
 }) => {
+  const digitOSLink =
+    "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/" +
+    digitHash;
+  const digitENSLink =
+    "https://app.ens.domains/name/" + digitName + ".eth/details";
   return (
     <div className="digit" id={digitHash} key={digitHash}>
       <div className="digit-id">#{digitId}</div>
@@ -100,7 +112,7 @@ const fetchTokenPrices = async () => {
     for (let i = 0; i < chunk.length; i++) {
       const symbol = i === 0 ? "?" : "&";
       requests.push(
-        `${tokensAPI}${symbol}tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:${chun[i]}`
+        `${tokensAPI}${symbol}tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:${chunk[i]}`
       );
     }
   }
@@ -150,8 +162,8 @@ function filterList() {
 }
 
 function getDigitHash(digitName) {
-  const labelHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(digitName));
-  const tokenId = ethers.BigNumber.from(labelHash).toString();
+  const labelHash = utils.keccak256(utils.toUtf8Bytes(digitName));
+  const tokenId = BigNumber.from(labelHash).toString();
   return tokenId;
 }
 
@@ -232,16 +244,16 @@ export default function Home() {
             digits[nameHash].price = 0;
           }
         }
-        localStorage.pricesUpdatedAt = Date.now();
+        //    localStorage.pricesUpdatedAt = Date.now();
       }
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    localStorage.digits = JSON.stringify(digits);
-  }, [digits]);
+  // useEffect(() => {
+  //   localStorage.digits = JSON.stringify(digits);
+  // }, [digits]);
 
   return (
     <div className="container">
@@ -267,7 +279,7 @@ export default function Home() {
               <input
                 type="checkbox"
                 id="7-digits-filter"
-                onclick="filterList()"
+                onClick={filterList}
               />
               <span className="slider round"></span>
             </label>
@@ -276,17 +288,13 @@ export default function Home() {
               <input
                 type="checkbox"
                 id="pre-punk-filter"
-                onclick="filterList()"
+                onClick={filterList}
               />
               <span className="slider round"></span>
             </label>
             <label className="filterLabel">Buy Now:</label>
             <label className="switch">
-              <input
-                type="checkbox"
-                id="buy-now-filter"
-                onclick="filterList()"
-              />
+              <input type="checkbox" id="buy-now-filter" onClick={filterList} />
               <span className="slider round"></span>
             </label>
             <label className="filterLabel">Available:</label>
@@ -294,7 +302,7 @@ export default function Home() {
               <input
                 type="checkbox"
                 id="available-filter"
-                onclick="filterList()"
+                onClick={filterList}
               />
               <span className="slider round"></span>
             </label>
@@ -302,10 +310,11 @@ export default function Home() {
           </div>
           <div className="digitlist">
             {Object.keys(digits).map((nameHash) => {
-              const digit = digits[namehash];
+              const digit = digits[nameHash];
 
               return (
                 <DigitRow
+                  key={digit.id}
                   digitId={digit.id}
                   digitName={digit.name}
                   digitPrice={digit.price}
