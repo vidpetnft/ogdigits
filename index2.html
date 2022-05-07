@@ -65,7 +65,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 20;
+            const LOCAL_STORAGE_VERSION = 21;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
@@ -133,7 +133,7 @@
 
             function fetchDigits(){
                 if (LOCAL_TEST){
-                    storeDigits(testJson.jsonData);
+                    storeDigits(testJsonFull.jsonData);
                 }
                 else{
                     fetch("./2017digits.json")
@@ -214,7 +214,6 @@
 
             function updateDigits(data)
             {
-                console.log("tokens received: "+Object.keys(data.tokens).length);
                 for (var key in data.tokens)
                 {
                     const nameHash = data.tokens[key].tokenId;
@@ -255,14 +254,12 @@
 
             function fetchSalesFor(startTimestamp, endTimestamp){
                 const url = SALES_API_URL + "&startTimestamp=" + startTimestamp + "&endTimestamp=" + endTimestamp + "&limit=" + SALES_API_LIMIT;
-                console.log(url);
                 fetch(url)
                     .then(response => response.json())
                     .then(data => findDigitSales(data));
             }
 
             function findDigitSales(data){
-                console.log(data.sales);
                 for (id in data.sales){
                     const nameHash = data.sales[id].token.tokenId;
                     if (digits[nameHash] != null){
