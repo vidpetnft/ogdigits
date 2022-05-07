@@ -343,7 +343,7 @@
                     if ($("#pre-punk-filter").is(":checked") && digits[nameHash].id>PRE_PUNK_CUT_OFF){
                         digitVisible = false;
                     }
-                    if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0){
+                    if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0 && activeTab == ITEMS_VIEW){
                         digitVisible = false;
                     }
 
