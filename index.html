@@ -29,25 +29,32 @@
                 <p>by</p>
             </div>
             <h2>All the digit ENS names registered in 2017</h2>
-            <div class="filterContainer">
-                <label class="filterLabel">7 Digits</label>
+            <div class="filter-container">
+                <label class="filter-label">7 Digits</label>
                 <label class="switch">
                     <input type="checkbox" id="7-digits-filter" onclick="filterList()">
                     <span class="slider round"></span>
                 </label>
-                <label class="filterLabel">Pre Punk:</label>
+                <label class="filter-label">Pre Punk:</label>
                 <label class="switch">
                     <input type="checkbox" id="pre-punk-filter" onclick="filterList()">
                     <span class="slider round"></span>
                 </label>
-                <label class="filterLabel">Buy Now:</label>
+                <label class="filter-label">Buy Now:</label>
                 <label class="switch">
                     <input type="checkbox" id="buy-now-filter" onclick="filterList()">
                     <span class="slider round"></span>
                 </label>
-                <div class="listLengthInfo">0 Item</div>
+                <div class="sort-switch">
+                    <label class="filter-label">Sort by price:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="sort-by-price" onclick="sortList()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
-            <div class="digitlist">
+            <div class="list-length-info">0 Item</div>
+            <div class="digit-list">
             </div>
             <p class="footer">Made with ❤️ - This is a personal hobby project, please use the tool at your own risk!</p>
         </div>
@@ -129,7 +136,7 @@
                 digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
 
                 digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitOSLinkDiv, digitENSLinkDiv);
-                $(".digitlist").append(digitDiv);
+                $(".digit-list").append(digitDiv);
             }
 
             function fetchTokenPrices(){
@@ -143,14 +150,12 @@
                         parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+(nameHash);
                         count++;
                         if (count >= TOKEN_API_LIMIT){
-                            console.log("tokens requested: "+count);
                             fetchTokens(parameters);
                             count = 0;
                             parameters = "";
                         }
                     }
                     if (count > 0){
-                        console.log("tokens requested: "+count);
                         fetchTokens(parameters);
                     }
                 }
@@ -214,6 +219,46 @@
                 updateListLengthInfo(count);
             }
 
+            function sortList(){
+                var digitElements = new Object();
+                for (var nameHash in digits){
+                    digitElements[nameHash] = $("#"+nameHash).detach();
+                }
+
+                if ($("#sort-by-price").is(":checked")){
+                    var sortable = [];
+                    var nonSortable = [];
+                    for (var nameHash in digits) {
+                        var digitPriceObject = new Object();
+                        digitPriceObject.nameHash = nameHash;
+                        digitPriceObject.price = digits[nameHash].price;
+                        if (digits[nameHash].price > 0){
+                            sortable.push(digitPriceObject);
+                        }
+                        else{
+                            nonSortable.push(digitPriceObject);
+                        }
+                    }
+
+                    sortable.sort(function (a, b) {
+                        return a.price - b.price;
+                    });
+
+                    for (var id in sortable){
+                        $(".digit-list").append(digitElements[sortable[id].nameHash]);
+                    }
+
+                    for (var id in nonSortable){
+                        $(".digit-list").append(digitElements[nonSortable[id].nameHash]);
+                    }
+                }
+                else{
+                    for (var nameHash in digits){
+                        $(".digit-list").append(digitElements[nameHash]);
+                    }
+                }
+            }
+
             function getDigitHash(digitName){
                 const labelHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(digitName));
                 const tokenId = ethers.BigNumber.from(labelHash).toString();
@@ -221,7 +266,7 @@
             }
 
             function updateListLengthInfo(length){
-                $(".listLengthInfo").text(length+" Items");
+                $(".list-length-info").text(length+" Items");
             }
 
             function getCellColor(digitPrice){

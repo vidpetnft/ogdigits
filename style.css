@@ -59,10 +59,9 @@ body {
     padding: 30px;
 }
 
-.digitlist {
+.digit-list {
     color: white;
     font-size: 17px;
-    padding-top: 10px;
 }
 
 .digit {
@@ -100,21 +99,33 @@ body {
 .digit-enslink {
 }
 
-.filterContainer {
+.filter-container {
     padding-top: 50px;
 }
 
-.filterContainer label {
+.filter-container label {
     color: white;
 }
 
-.filterContainer label {
+.filter-container label {
     color: white;
 }
 
-.listLengthInfo {
+.list-length-info {
     color: white;
-    float: right;
+    margin-left: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.filter-label{
+  margin-left: 10px;
+}
+
+.sort-switch{
+  float: right;
+  display: inline-block;
 }
 
 .switch {
@@ -122,7 +133,7 @@ body {
   display: inline-block;
   width: 50px;
   height: 24px;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .switch input { 
