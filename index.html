@@ -57,6 +57,7 @@
             const LOCAL_STORAGE_VERSION = 10;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
+            const TOKEN_API_LIMIT = 50;
 
             var digits;
 
@@ -79,7 +80,7 @@
 
             function fetchDigits(){
                 if (LOCAL_TEST){
-                    storeDigits(testJson.jsonData);
+                    storeDigits(testJsonFull.jsonData);
                 }
                 else{
                     fetch("./2017digits.json")
@@ -143,7 +144,9 @@
                         parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+(nameHash);
                         count++;
                         tokenlist+=digits[nameHash].id+",";
-                        if (count >= 20){
+                        if (count >= TOKEN_API_LIMIT){
+                            console.log("tokens requested: "+count);
+                            parameters+="&limit="+TOKEN_API_LIMIT;
                             fetch(tokensAPI+parameters)
                                 .then(response => response.json())
                                 .then(data => updateDigits(data));
@@ -153,6 +156,8 @@
                         }
                     }
                     if (count > 0){
+                        console.log("tokens requested: "+count);
+                        parameters+="&limit="+TOKEN_API_LIMIT;
                         fetch(tokensAPI+parameters)
                             .then(response => response.json())
                             .then(data => updateDigits(data));
@@ -162,6 +167,7 @@
 
             function updateDigits(data)
             {
+                console.log("tokens received: "+Object.keys(data.tokens).length);
                 for (var key in data.tokens)
                 {
                     const nameHash = data.tokens[key].tokenId;
@@ -266,6 +272,7 @@
                           }
                         ]
                     };
+
         </script>
 
 
