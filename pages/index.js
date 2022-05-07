@@ -1,5 +1,4 @@
 import { BigNumber, utils } from "ethers";
-import { namehash } from "ethers/lib/utils";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
@@ -121,13 +120,11 @@ const fetchTokenPrices = async (digits) => {
 
   const results = await Promise.all(
     requests.map(async (request) => {
-      const res = await fetch(request, {
-        mode: "no-cors",
-      });
+      const res = await fetch(request);
       return await res.json();
     })
   );
-
+  console.log("results", results);
   return results;
 };
 
@@ -219,6 +216,7 @@ const testJson = {
     },
   ],
 };
+
 export default function Home() {
   const [digits, setDigits] = useState({});
   const [priceQueried, setPriceQueried] = useState(false);
@@ -226,9 +224,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       if (Object.keys(digits).length === 0) {
-        console.log("loadDigits 1");
         const result = await loadDigits();
-        console.log("loadDigits 2");
         setDigits(result);
       }
     };
@@ -236,32 +232,32 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (Object.keys(digits).length > 0 && !priceQueried) {
-  //       const digitsCopy = JSON.parse(JSON.stringify(digits));
-  //       console.log("fetchTokenPrices", 1);
-  //       const data = fetchTokenPrices(digits);
-  //       console.log("fetchTokenPrices", 2);
-  //       for (const key in data.tokens) {
-  //         const nameHash = data.tokens[key].tokenId;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (Object.keys(digits).length > 0 && !priceQueried) {
+        const digitsCopy = JSON.parse(JSON.stringify(digits));
+        console.log("fetchTokenPrices", 1);
+        const data = await fetchTokenPrices(digits);
+        console.log("fetchTokenPrices", 2);
+        for (const key in data.tokens) {
+          const nameHash = data.tokens[key].tokenId;
 
-  //         if (data.tokens[key].floorAskPrice != null) {
-  //           digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
-  //         } else if (data.tokens[key].name == null) {
-  //           digitsCopy[nameHash].price = -1;
-  //         } else {
-  //           digitsCopy[nameHash].price = 0;
-  //         }
-  //       }
-  //       setDigits(digitsCopy);
-  //       setPriceQueried(true);
-  //       //    localStorage.pricesUpdatedAt = Date.now();
-  //     }
-  //   };
+          if (data.tokens[key].floorAskPrice != null) {
+            digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
+          } else if (data.tokens[key].name == null) {
+            digitsCopy[nameHash].price = -1;
+          } else {
+            digitsCopy[nameHash].price = 0;
+          }
+        }
+        setDigits(digitsCopy);
+        setPriceQueried(true);
+        //    localStorage.pricesUpdatedAt = Date.now();
+      }
+    };
 
-  //   fetchData();
-  // }, [digits]);
+    fetchData();
+  }, [digits]);
 
   // useEffect(() => {
   //   localStorage.digits = JSON.stringify(digits);
