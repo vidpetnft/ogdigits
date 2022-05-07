@@ -54,9 +54,11 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 10;
+            const LOCAL_STORAGE_VERSION = 11;
             const CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
+            
+            const TOKEN_API_URL = "https://api.reservoir.tools/tokens/v4";
             const TOKEN_API_LIMIT = 50;
 
             var digits;
@@ -80,7 +82,7 @@
 
             function fetchDigits(){
                 if (LOCAL_TEST){
-                    storeDigits(testJsonFull.jsonData);
+                    storeDigits(testJson.jsonData);
                 }
                 else{
                     fetch("./2017digits.json")
@@ -132,37 +134,33 @@
 
             function fetchTokenPrices(){
                 if (Date.now() - localStorage.pricesUpdatedAt > CACHE_INVALIDATION_TIME){
-                    const tokensAPI = "https://api.reservoir.tools/tokens/v4";
-
                     var parameters = "";
                     var count = 0;
-                    var tokenlist = "";
 
                     console.log("fetching tokens");
                     for (var nameHash in digits){
                         parameters+=(parameters.length>0 ? "&" : "?");
                         parameters+="tokens=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:"+(nameHash);
                         count++;
-                        tokenlist+=digits[nameHash].id+",";
                         if (count >= TOKEN_API_LIMIT){
                             console.log("tokens requested: "+count);
-                            parameters+="&limit="+TOKEN_API_LIMIT;
-                            fetch(tokensAPI+parameters)
-                                .then(response => response.json())
-                                .then(data => updateDigits(data));
+                            fetchTokens(parameters);
                             count = 0;
                             parameters = "";
-                            tokenlist = "";
                         }
                     }
                     if (count > 0){
                         console.log("tokens requested: "+count);
-                        parameters+="&limit="+TOKEN_API_LIMIT;
-                        fetch(tokensAPI+parameters)
-                            .then(response => response.json())
-                            .then(data => updateDigits(data));
+                        fetchTokens(parameters);
                     }
                 }
+            }
+
+            function fetchTokens(parameters){
+                parameters+="&limit="+TOKEN_API_LIMIT;
+                fetch(TOKEN_API_URL+parameters)
+                    .then(response => response.json())
+                    .then(data => updateDigits(data));
             }
 
             function updateDigits(data)
