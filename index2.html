@@ -30,8 +30,8 @@
             </div>
             <h2>All the digit ENS names registered in 2017</h2>
             <div class="nav-container">
-                <a class="nav-button-active" id="items-button" onclick="navItems()" href="#0">Items</a>
-                <a class="nav-button" id="sales-button" onclick="navSales()" href="#0">Sales</a>
+                <a class="nav-button-active" id="items-button" onclick="navItems()" href="#">Items</a>
+                <a class="nav-button" id="sales-button" onclick="navSales()" href="#">Sales</a>
             </div>
             <div class="filter-container">
                 <label class="filter-label">7 Digits</label>
@@ -65,7 +65,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 21;
+            const LOCAL_STORAGE_VERSION = 22;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
@@ -266,7 +266,9 @@
                         var sale = new Object();
                         sale.price = data.sales[id].price;
                         sale.time = data.sales[id].timestamp;
-                        sales[nameHash] = sale;
+                        sale.nameHash = nameHash;
+                        var id = nameHash+time;
+                        sales[id] = sale;
                     }
                 }
 
@@ -308,12 +310,12 @@
 
             function sortSales(){
                 var sortedSales = [];
-                for (var nameHash in sales) {
+                for (var id in sales) {
                     var saleInfo = new Object();
-                    saleInfo.nameHash = nameHash;
-                    saleInfo.price = sales[nameHash].price;
-                    saleInfo.name = digits[nameHash].name;
-                    saleInfo.time = sales[nameHash].time;
+                    saleInfo.nameHash = sales[id].nameHash;
+                    saleInfo.price = sales[id].price;
+                    saleInfo.name = digits[sales[id].nameHash].name;
+                    saleInfo.time = sales[id].time;
                     sortedSales.push(saleInfo);
                 }
 
