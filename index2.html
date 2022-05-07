@@ -65,7 +65,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 24;
+            const LOCAL_STORAGE_VERSION = 27;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 424;
@@ -77,13 +77,16 @@
             const SALES_API_LIMIT = 1000;
             const SALES_TIME_WINDOW = 4;
 
+            const ITEMS_VIEW = "itemview";
+            const SALES_VIEW = "salesview";
+
             var digits;
             var sales;
 
-            var navigationEnabled;
+            var activeTab = ITEMS_VIEW;
 
             function navItems(){
-                if ( ! $("#items-button").hasClass("nav-button-active")){
+                if (activeTab != ITEMS_VIEW){
                     $("#items-button").removeClass("nav-button");
                     $("#sales-button").removeClass("nav-button-active");
                     $("#items-button").addClass("nav-button-active");
@@ -93,13 +96,15 @@
                     $("#buy-now-filter-switch").show();
                     $(".digit-list").show();
                     $(".sales-list").hide();
+                    activeTab = ITEMS_VIEW;
 
                     fetchTokenPrices();
+                    filterList();
                 }
             }
 
             function navSales(){
-                if ( ! $("#sales-button").hasClass("nav-button-active")){
+                if (activeTab != SALES_VIEW){
                     $("#items-button").removeClass("nav-button-active");
                     $("#sales-button").removeClass("nav-button");
                     $("#items-button").addClass("nav-button");
@@ -109,6 +114,7 @@
                     $("#buy-now-filter-switch").hide();
                     $(".digit-list").hide();
                     $(".sales-list").show();
+                    activeTab = SALES_VIEW;
 
                     fetchSales();
                 }
@@ -171,7 +177,7 @@
                 const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
 
-                const digitDiv = $("<div class=\"digit\" id=\""+digitHash+"\">");
+                const digitDiv = $("<div class=\"digit\" id=\"digit-"+digitHash+"\">");
                 const digitIdDiv = $("<div class=\"digit-id\">#"+digitId+"</div>");
                 const digitNameDiv = $("<div class=\"digit-name\" style=\"background-color:"+getCellColor(digitPrice)+"\">"+digitName+".eth</div>");
                 const digitPriceDiv = $(" <div class=\"digit-price\">"+getPriceLabel(digitPrice)+"</div>");
@@ -228,8 +234,8 @@
                         digits[nameHash].price = 0;
                     }
 
-                    $("#"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
-                    $("#"+nameHash+" > .digit-price").text(getPriceLabel(digits[nameHash].price));
+                    $("#digit-"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
+                    $("#digit-"+nameHash+" > .digit-price").text(getPriceLabel(digits[nameHash].price));
                 }
 
                 localStorage.pricesUpdatedAt = Date.now();
@@ -289,6 +295,7 @@
                 for (var id in sortedSales){
                     renderSale(sortedSales[id].nameHash, String(sortedSales[id].name), sortedSales[id].price, sortedSales[id].time);
                 }
+                filterList();
             }
 
             function renderSale(nameHash, digitName, salePrice, saleTime){
@@ -296,7 +303,7 @@
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
                 const salePriceLabel = +String(salePrice).substring(0,5)+"Ξ";
 
-                const saleDiv = $("<div class=\"sale\" id=\""+nameHash+"\">");
+                const saleDiv = $("<div class=\"sale\" id=\"sale-"+nameHash+"\">");
                 const saleNameDiv = $("<div class=\"sale-name\">"+digitName+".eth</div>");
                 const saleLabelDiv = $("<div class=\"sale-label\">sold for:</div>");
                 const salePriceDiv = $(" <div class=\"sale-price\">"+salePriceLabel+"</div>");
@@ -340,12 +347,20 @@
                         digitVisible = false;
                     }
 
+                    var divElement;
+                    if (activeTab == ITEMS_VIEW){
+                        divElement = $("#digit-"+nameHash);
+                    }
+                    else if (activeTab == SALES_VIEW){
+                        divElement = $("#sale-"+nameHash);
+                    }
+
                     if (digitVisible){
-                        $("#"+nameHash).show();
+                        divElement.show();
                         count++;
                     }
                     else{
-                        $("#"+nameHash).hide();
+                        divElement.hide();
                     }
                 }
 
@@ -355,7 +370,7 @@
             function sortDigitList(){
                 var digitElements = new Object();
                 for (var nameHash in digits){
-                    digitElements[nameHash] = $("#"+nameHash).detach();
+                    digitElements[nameHash] = $("#digit-"+nameHash).detach();
                 }
 
                 if ($("#sort-by-price").is(":checked")){
