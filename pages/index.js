@@ -76,18 +76,18 @@ const DigitRow = ({
           backgroundColor: getCellColor(digitPrice),
         }}
       >
-        {`${digitName} .eth`}
+        {`${digitName}.eth`}
       </div>
       <div className="digit-price">{getPriceLabel(digitPrice)}</div>
       <div className="digit-regdate">{digitRegDate}</div>
       <div className="digit-oslink">
         <a href={digitOSLink} target="_blank">
-          <img src="img/os-logo.png" height="22px" />
+          <img src="./os-logo.png" height="22px" />
         </a>
       </div>
       <div className="digit-enslink">
         <a href={digitENSLink} target="_blank">
-          <img src="img/ens-logo.png" height="22px" />
+          <img src="./ens-logo.png" height="22px" />
         </a>
       </div>
     </div>
