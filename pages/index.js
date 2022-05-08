@@ -128,39 +128,11 @@ const fetchTokenPrices = async (digits) => {
   return results;
 };
 
-function filterList() {
-  var count = 0;
-  for (var nameHash in digits) {
-    var digitVisible = true;
-    if (
-      $("#7-digits-filter").is(":checked") &&
-      String(digits[nameHash].name).length > 7
-    ) {
-      digitVisible = false;
-    }
-    if (
-      $("#pre-punk-filter").is(":checked") &&
-      digits[nameHash].id > PRE_PUNK_CUT_OFF
-    ) {
-      digitVisible = false;
-    }
-    if ($("#buy-now-filter").is(":checked") && digits[nameHash].price <= 0) {
-      digitVisible = false;
-    }
-    if ($("#available-filter").is(":checked") && digits[nameHash].price >= 0) {
-      digitVisible = false;
-    }
+const sevenDigitsFilter = (digit) => digit.name.toString().length === 7;
 
-    if (digitVisible) {
-      $("#" + nameHash).show();
-      count++;
-    } else {
-      $("#" + nameHash).hide();
-    }
-  }
+const prePunkFilter = (digit) => digit.id < PRE_PUNK_CUT_OFF;
 
-  updateListLengthInfo(count);
-}
+const buyNowFilter = (digit) => digit.price > 0;
 
 function getDigitHash(digitName) {
   const labelHash = utils.keccak256(utils.toUtf8Bytes(digitName));
@@ -220,6 +192,9 @@ const testJson = {
 export default function Home() {
   const [digits, setDigits] = useState({});
   const [priceQueried, setPriceQueried] = useState(false);
+  const [sevenDigit, setSevenDigit] = useState(false);
+  const [prePunk, setPrePunk] = useState(false);
+  const [buyNow, setBuyNow] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -290,7 +265,7 @@ export default function Home() {
               <input
                 type="checkbox"
                 id="7-digits-filter"
-                onClick={filterList}
+                onClick={() => setSevenDigit(!sevenDigit)}
               />
               <span className="slider round"></span>
             </label>
@@ -299,41 +274,46 @@ export default function Home() {
               <input
                 type="checkbox"
                 id="pre-punk-filter"
-                onClick={filterList}
+                onClick={() => setPrePunk(!prePunk)}
               />
               <span className="slider round"></span>
             </label>
             <label className="filterLabel">Buy Now:</label>
             <label className="switch">
-              <input type="checkbox" id="buy-now-filter" onClick={filterList} />
-              <span className="slider round"></span>
-            </label>
-            <label className="filterLabel">Available:</label>
-            <label className="switch">
               <input
                 type="checkbox"
-                id="available-filter"
-                onClick={filterList}
+                id="buy-now-filter"
+                onClick={() => setBuyNow(!sevenDigit)}
               />
               <span className="slider round"></span>
             </label>
             <div className="listLengthInfo">0 Item</div>
           </div>
           <div className="digitlist">
-            {Object.keys(digits).map((nameHash) => {
-              const digit = digits[nameHash];
+            {Object.keys(digits)
+              .filter((nameHash) =>
+                prePunk ? prePunkFilter(digits[nameHash]) : true
+              )
+              .filter((nameHash) =>
+                buyNow ? buyNowFilter(digits[nameHash]) : true
+              )
+              .filter((nameHash) =>
+                sevenDigit ? sevenDigitsFilter(digits[nameHash]) : true
+              )
+              .map((nameHash) => {
+                const digit = digits[nameHash];
 
-              return (
-                <DigitRow
-                  key={digit.id}
-                  digitId={digit.id}
-                  digitName={digit.name}
-                  digitPrice={digit.price}
-                  digitRegDate={digit.regdate}
-                  digitHash={nameHash}
-                />
-              );
-            })}
+                return (
+                  <DigitRow
+                    key={digit.id}
+                    digitId={digit.id}
+                    digitName={digit.name}
+                    digitPrice={digit.price}
+                    digitRegDate={digit.regdate}
+                    digitHash={nameHash}
+                  />
+                );
+              })}
           </div>
         </div>
       </main>
