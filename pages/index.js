@@ -239,15 +239,17 @@ export default function Home() {
         console.log("fetchTokenPrices", 1);
         const data = await fetchTokenPrices(digits);
         console.log("fetchTokenPrices", 2);
-        for (const key in data.tokens) {
-          const nameHash = data.tokens[key].tokenId;
+        for (const val of data) {
+          for (const key in val.tokens) {
+            const nameHash = val.tokens[key].tokenId;
 
-          if (data.tokens[key].floorAskPrice != null) {
-            digitsCopy[nameHash].price = data.tokens[key].floorAskPrice;
-          } else if (data.tokens[key].name == null) {
-            digitsCopy[nameHash].price = -1;
-          } else {
-            digitsCopy[nameHash].price = 0;
+            if (val.tokens[key].floorAskPrice != null) {
+              digitsCopy[nameHash].price = val.tokens[key].floorAskPrice;
+            } else if (val.tokens[key].name == null) {
+              digitsCopy[nameHash].price = -1;
+            } else {
+              digitsCopy[nameHash].price = 0;
+            }
           }
         }
         setDigits(digitsCopy);
