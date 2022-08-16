@@ -11,7 +11,7 @@
         </script>
 
         <link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
-        <link rel="stylesheet" href="style3.css">
+        <link rel="stylesheet" href="style.css">
         <link rel="icon" href="img/icon.png">
 
         <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
@@ -67,7 +67,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 31;
+            const LOCAL_STORAGE_VERSION = 32;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 473;
@@ -77,7 +77,7 @@
 
             const SALES_API_URL = "https://api.reservoir.tools/sales/bulk/v1?contract=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85";
             const SALES_API_LIMIT = 1000;
-            const SALES_TIME_WINDOW = 4;
+            const SALES_TIME_WINDOW = 5;
 
             const ITEMS_VIEW = "itemview";
             const SALES_VIEW = "salesview";
@@ -167,7 +167,7 @@
 
             function renderDigitList(){
                 for (var nameHash in digits){
-                    renderDigit(digits[nameHash].id, String(digits[nameHash].name), digits[nameHash].price, digits[nameHash].regdate, nameHash);
+                    renderDigit(digits[nameHash].id, String(digits[nameHash].name), digits[nameHash].price, digits[nameHash].source, digits[nameHash].regdate, nameHash);
                 }
 
                 updateListLengthInfo(Object.keys(digits).length);
@@ -175,8 +175,7 @@
                 fetchTokenPrices();
             }
 
-            function renderDigit(digitId, digitName, digitPrice, digitRegDate, digitHash){
-                const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
+            function renderDigit(digitId, digitName, digitPrice, marketplace, digitRegDate, digitHash){
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
 
                 const digitDiv = $("<div class=\"digit\" id=\"digit-"+digitHash+"\">");
@@ -184,10 +183,10 @@
                 const digitNameDiv = $("<div class=\"digit-name\" style=\"background-color:"+getCellColor(digitPrice)+"\">"+digitName+".eth</div>");
                 const digitPriceDiv = $(" <div class=\"digit-price\">"+getPriceLabel(digitPrice)+"</div>");
                 const digitRegDateDiv = $("<div class=\"digit-regdate\">"+digitRegDate+"</div>");
-                const digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
+                const digitMarketplaceLinkDiv = $("<div class=\"digit-marketplacelink\"><a href=\""+getMarketplaceLink(digitName, digitHash, marketplace)+"\" target=\"_blank\"><img src=\""+getMarketplaceLogo(marketplace)+"\" height=\"22px\"></a></div>");
                 const digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
 
-                digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitOSLinkDiv, digitENSLinkDiv);
+                digitDiv.append(digitIdDiv, digitNameDiv, digitPriceDiv, digitRegDateDiv, digitMarketplaceLinkDiv, digitENSLinkDiv);
                 $(".digit-list").append(digitDiv);
             }
 
@@ -236,8 +235,12 @@
                         digits[nameHash].price = 0;
                     }
 
+                    digits[nameHash].marketplace = data.tokens[key].source;
+
                     $("#digit-"+nameHash+" > .digit-name").css("background-color", getCellColor(digits[nameHash].price));
                     $("#digit-"+nameHash+" > .digit-price").text(getPriceLabel(digits[nameHash].price));
+                    $("#digit-"+nameHash+" > .digit-marketplacelink > a").attr("href", getMarketplaceLink(digits[nameHash].name,nameHash,digits[nameHash].marketplace));
+                    $("#digit-"+nameHash+" > .digit-marketplacelink > a > img").attr("src", getMarketplaceLogo(digits[nameHash].marketplace));
                 }
 
                 localStorage.pricesUpdatedAt = Date.now();
@@ -336,7 +339,7 @@
             }
 
             function onFilterChanged(){
-                //console.log(JSON.stringify(sales));
+                console.log(JSON.stringify(sales));
                 filterList();
             }
 
@@ -430,6 +433,43 @@
                     cellColor = "#a5c8ec";
                 }
                 return cellColor;
+            }
+
+            function getMarketplaceLink(digitName,digitHash,marketplace){
+                if (marketplace == "OpenSea"){
+                    return "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
+                }
+                else if (marketplace == "ENSVision"){
+                    return "https://www.ens.vision/name/"+digitName
+                }
+                else if (marketplace == "LOOKSRARE"){
+                    return "https://looksrare.org/collections/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/"+digitHash;
+                }
+                else if (marketplace == "X2Y2"){
+                    return "https://x2y2.io/eth/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/"+digitHash;
+                }
+                else{
+                    //OpenSea is the default if the digit is not for sale
+                    return "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+digitHash;
+                }
+            }
+
+            function getMarketplaceLogo(marketplace){
+                if (marketplace == "OpenSea"){
+                    return "img/os-logo.png";
+                }
+                else if (marketplace == "ENSVision"){
+                    return "img/ensvision-logo.png";
+                }
+                else if (marketplace == "LOOKSRARE"){
+                    return "img/looksrare-logo.png";
+                }
+                else if (marketplace == "X2Y2"){
+                    return "img/x2y2-logo.png";
+                }
+                else{
+                    return "img/os-logo.png";
+                }
             }
 
             function getPriceLabel(digitPrice){
