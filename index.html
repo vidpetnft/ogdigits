@@ -167,7 +167,7 @@
 
             function renderDigitList(){
                 for (var nameHash in digits){
-                    renderDigit(digits[nameHash].id, String(digits[nameHash].name), digits[nameHash].price, digits[nameHash].source, digits[nameHash].regdate, nameHash);
+                    renderDigit(digits[nameHash].id, String(digits[nameHash].name), digits[nameHash].price, digits[nameHash].marketplace, digits[nameHash].regdate, nameHash);
                 }
 
                 updateListLengthInfo(Object.keys(digits).length);
