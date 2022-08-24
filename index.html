@@ -67,7 +67,7 @@
 
         <script>
             const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 34;
+            const LOCAL_STORAGE_VERSION = 35;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 505;
@@ -278,8 +278,9 @@
                         sale.price = data.sales[id].price;
                         sale.time = data.sales[id].timestamp;
                         sale.nameHash = nameHash;
-                        var id = nameHash+"-"+sale.time;
-                        sales[id] = sale;
+                        sale.marketplace = data.sales[id].orderSource;
+                        var saleHash = nameHash+"-"+sale.time;
+                        sales[saleHash] = sale;
                     }
                 }
 
@@ -298,13 +299,12 @@
                 $(".filter-container").after($("<div class=\"sales-list\">"));
 
                 for (var id in sortedSales){
-                    renderSale(sortedSales[id].nameHash, String(sortedSales[id].name), sortedSales[id].price, sortedSales[id].time);
+                    renderSale(sortedSales[id].nameHash, String(sortedSales[id].name), sortedSales[id].price, sortedSales[id].time, sortedSales[id].marketplace);
                 }
                 filterList();
             }
 
-            function renderSale(nameHash, digitName, salePrice, saleTime){
-                const digitOSLink = "https://opensea.io/assets/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/"+nameHash;
+            function renderSale(nameHash, digitName, salePrice, saleTime, marketplace){
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
                 const salePriceLabel = +String(salePrice).substring(0,5)+"Ξ";
 
@@ -313,21 +313,22 @@
                 const saleLabelDiv = $("<div class=\"sale-label\">sold for:</div>");
                 const salePriceDiv = $(" <div class=\"sale-price\">"+salePriceLabel+"</div>");
                 const saleTimeDiv = $("<div class=\"sale-time\">"+getTimeLabel(saleTime)+"</div>");
-                digitOSLinkDiv = $("<div class=\"digit-oslink\"><a href=\""+digitOSLink+"\" target=\"_blank\"><img src=\"img/os-logo.png\" height=\"22px\"></a></div>");
+                const digitMarketplaceLinkDiv = $("<div class=\"digit-marketplacelink\"><a href=\""+getMarketplaceLink(digitName, nameHash, marketplace)+"\" target=\"_blank\"><img src=\""+getMarketplaceLogo(marketplace)+"\" height=\"22px\"></a></div>");
                 digitENSLinkDiv = $("<div class=\"digit-enslink\"><a href=\""+digitENSLink+"\" target=\"_blank\"><img src=\"img/ens-logo.png\" height=\"22px\"></a></div> ");
 
-                saleDiv.append(saleNameDiv, saleLabelDiv, salePriceDiv, saleTimeDiv, digitOSLinkDiv, digitENSLinkDiv);
+                saleDiv.append(saleNameDiv, saleLabelDiv, salePriceDiv, saleTimeDiv, digitMarketplaceLinkDiv, digitENSLinkDiv);
                 $(".sales-list").append(saleDiv);
             }
 
             function sortSales(){
                 var sortedSales = [];
-                for (var id in sales) {
+                for (var saleHash in sales) {
                     var saleInfo = new Object();
-                    saleInfo.nameHash = sales[id].nameHash;
-                    saleInfo.price = sales[id].price;
-                    saleInfo.name = digits[sales[id].nameHash].name;
-                    saleInfo.time = sales[id].time;
+                    saleInfo.nameHash = sales[saleHash].nameHash;
+                    saleInfo.price = sales[saleHash].price;
+                    saleInfo.name = digits[sales[saleHash].nameHash].name;
+                    saleInfo.time = sales[saleHash].time;
+                    saleInfo.marketplace = sales[saleHash].marketplace;
                     sortedSales.push(saleInfo);
                 }
 
