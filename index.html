@@ -141,7 +141,7 @@
 
             function fetchDigits(){
                 if (LOCAL_TEST){
-                    storeDigits(testJson.jsonData);
+                    storeDigits(LOCAL_TEST_JSON.jsonData);
                 }
                 else{
                     fetch("./2017digits.json")
@@ -250,7 +250,7 @@
             function fetchSales(){
                 if (localStorage.sales == null || (Date.now() - localStorage.salesUpdatedAt > SALES_CACHE_INVALIDATION_TIME)){
                     console.log("fetching sales");
-                    sales = JSON.parse(oldSales);
+                    sales = JSON.parse(SALES_HISTORY);
                     for (let hour=0;hour<SALES_TIME_WINDOW;hour++){
                         const startTimestamp = Math.round(Date.now() / 1000) - (hour+1)*60*60;
                         const endTimestamp = Math.round(Date.now() / 1000) - (hour)*60*60;
