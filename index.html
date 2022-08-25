@@ -17,8 +17,6 @@
         <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js" integrity="sha512-PmGDkK2UHGzTUfkFGcJ8YSrD/swUXekcca+1wWlrwALIZho9JX+3ddaaI9wmmf8PmgDIpMtx6TU8YBJAZS0mPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-        <script type="application/javascript" src="data.js"></script>
         
         <title>OG Digits Club</title>
     </head>
@@ -66,8 +64,7 @@
         </div>
 
         <script>
-            const LOCAL_TEST = false;
-            const LOCAL_STORAGE_VERSION = 35;
+            const LOCAL_STORAGE_VERSION = 36;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 505;
@@ -77,10 +74,12 @@
 
             const SALES_API_URL = "https://api.reservoir.tools/sales/bulk/v1?contract=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85";
             const SALES_API_LIMIT = 1000;
-            const SALES_TIME_WINDOW = 5;
+            const SALES_TIME_WINDOW = 15;
 
             const ITEMS_VIEW = "itemview";
             const SALES_VIEW = "salesview";
+
+            const ETHER_SIGN = "&#926;";
 
             var digits;
             var sales;
@@ -118,7 +117,7 @@
                     $(".sales-list").show();
                     activeTab = SALES_VIEW;
 
-                    fetchSales();
+                    loadSalesHistory();
                 }
             }
 
@@ -140,14 +139,9 @@
             }
 
             function fetchDigits(){
-                if (LOCAL_TEST){
-                    storeDigits(LOCAL_TEST_JSON.jsonData);
-                }
-                else{
-                    fetch("./2017digits.json")
-                    .then(response => response.json())
-                    .then(jsonData => storeDigits(jsonData));
-                }
+                fetch("./ogdigits.json")
+                .then(response => response.json())
+                .then(jsonData => storeDigits(jsonData));
             }
 
             function storeDigits(jsonData){
@@ -247,10 +241,29 @@
                 localStorage.digits = JSON.stringify(digits);
             }
 
+            function loadSalesHistory(){
+                if (localStorage.sales == null){
+                    fetch("./sales.json")
+                    .then(response => response.json())
+                    .then(jsonData => storeSalesHistory(jsonData));
+                }
+                else{
+                    sales = JSON.parse(localStorage.sales);
+                    fetchSales();
+                }
+            }
+
+            function storeSalesHistory(jsonData){
+                sales = jsonData[0];
+                localStorage.sales = JSON.stringify(sales);
+                localStorage.salesUpdatedAt = -1;
+
+                fetchSales();
+            }
+
             function fetchSales(){
-                if (localStorage.sales == null || (Date.now() - localStorage.salesUpdatedAt > SALES_CACHE_INVALIDATION_TIME)){
+                if (Date.now() - localStorage.salesUpdatedAt > SALES_CACHE_INVALIDATION_TIME){
                     console.log("fetching sales");
-                    sales = JSON.parse(SALES_HISTORY);
                     for (let hour=0;hour<SALES_TIME_WINDOW;hour++){
                         const startTimestamp = Math.round(Date.now() / 1000) - (hour+1)*60*60;
                         const endTimestamp = Math.round(Date.now() / 1000) - (hour)*60*60;
@@ -258,7 +271,6 @@
                     }
                 }
                 else{
-                    sales = JSON.parse(localStorage.sales);
                     renderSalesList();
                 }
             }
@@ -306,7 +318,7 @@
 
             function renderSale(nameHash, digitName, salePrice, saleTime, marketplace){
                 const digitENSLink = "https://app.ens.domains/name/"+digitName+".eth/details";
-                const salePriceLabel = +String(salePrice).substring(0,5)+"Ξ";
+                const salePriceLabel = +String(salePrice).substring(0,5)+ETHER_SIGN;
 
                 const saleDiv = $("<div class=\"sale\" id=\"sale-"+nameHash+"\">");
                 const saleNameDiv = $("<div class=\"sale-name\">"+digitName+".eth</div>");
@@ -340,7 +352,7 @@
             }
 
             function onFilterChanged(){
-                console.log(JSON.stringify(sales));
+                console.log('['+JSON.stringify(sales)+']');
                 filterList();
             }
 
@@ -474,7 +486,7 @@
             }
 
             function getPriceLabel(digitPrice){
-                return (digitPrice>0) ? digitPrice+"Ξ" : "-";
+                return (digitPrice>0) ? digitPrice+ETHER_SIGN : "-";
             }
 
             function getTimeLabel(timeStamp){
