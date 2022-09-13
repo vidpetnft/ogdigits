@@ -68,7 +68,7 @@
         </div>
 
         <script>
-            const LOCAL_STORAGE_VERSION = 45;
+            const LOCAL_STORAGE_VERSION = 47;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 506;
@@ -154,9 +154,11 @@
                 digits = new Object();
 
                 for (var key in jsonData){
-                    var digitNameHash = getDigitHash(String(jsonData[key].name));
+                    var digitName = String(jsonData[key].name);
+                    var digitNameHash = getDigitHash(digitName);
                     digits[digitNameHash] = jsonData[key];
                     digits[digitNameHash].price = 0;
+                    digits[digitNameHash].palindrome = (digitName == digitName.split('').reverse().join(''));
                 }
 
                 localStorage.pricesUpdatedAt = -1;
@@ -375,7 +377,7 @@
                     if ($("#buy-now-filter").is(":checked") && digits[nameHash].price<=0 && activeTab == ITEMS_VIEW){
                         digitVisible = false;
                     }
-                    if ($("#palindrome-filter").is(":checked") && digits[nameHash].name != digits[nameHash].name.split('').reverse().join('')){
+                    if ($("#palindrome-filter").is(":checked") && ! digits[nameHash].palindrome){
                         digitVisible = false;
                     }
 
