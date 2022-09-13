@@ -101,13 +101,12 @@ body {
 
 .filter-container {
     padding-top: 50px;
+    margin-left: 10px;
 }
 
 .filter-container label {
-    color: white;
-}
-
-.filter-container label {
+    margin-left: 4px;
+    font-size: 15px;
     color: white;
 }
 
@@ -119,10 +118,6 @@ body {
     font-weight: normal;
 }
 
-.filter-label{
-  margin-left: 10px;
-}
-
 .sort-switch{
   float: right;
   display: inline-block;
@@ -131,8 +126,8 @@ body {
 .switch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 24px;
+  width: 40px;
+  height: 20px;
   margin-right: 10px;
 }
 
@@ -157,8 +152,8 @@ body {
 .slider:before {
   position: absolute;
   content: "";
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   left: 1px;
   bottom: 1px;
   background-color: white;
@@ -252,7 +247,6 @@ input:checked + .slider:before {
 .nav-button:hover{
     background-color: grey;
 }
-
 
 
 
