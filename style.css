@@ -187,6 +187,7 @@ input:checked + .slider:before {
 .sales-list {
     color: white;
     font-size: 17px;
+    padding-top: 20px;
 }
 
 .sale {

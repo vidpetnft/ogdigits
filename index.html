@@ -55,8 +55,8 @@
                     <input type="checkbox" id="buy-now-filter" onclick="onFilterChanged()">
                     <span class="slider round"></span>
                 </label>
-                <label>Sort by price:</label>
-                <label class="switch">
+                <label id="sort-by-price-label">Sort by price:</label>
+                <label class="switch" id="sort-by-price-switch">
                     <input type="checkbox" id="sort-by-price" onclick="sortDigitList()">
                     <span class="slider round"></span>
                 </label>
@@ -96,7 +96,8 @@
                     $("#sales-button").removeClass("nav-button-active");
                     $("#items-button").addClass("nav-button-active");
                     $("#sales-button").addClass("nav-button");
-                    $(".sort-switch").show();
+                    $("#sort-by-price-label").show();
+                    $("#sort-by-price-switch").show();
                     $("#buy-now-filter-label").show();
                     $("#buy-now-filter-switch").show();
                     $(".digit-list").show();
@@ -114,7 +115,8 @@
                     $("#sales-button").removeClass("nav-button");
                     $("#items-button").addClass("nav-button");
                     $("#sales-button").addClass("nav-button-active");
-                    $(".sort-switch").hide();
+                    $("#sort-by-price-label").hide();
+                    $("#sort-by-price-switch").hide();
                     $("#buy-now-filter-label").hide();
                     $("#buy-now-filter-switch").hide();
                     $(".digit-list").hide();
