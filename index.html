@@ -35,40 +35,52 @@
                 <a class="nav-button" id="sales-button" onclick="navSales()" href="#">Sales</a>
             </div>
             <div class="filter-container">
-                <label>7 Digits</label>
-                <label class="switch">
-                    <input type="checkbox" id="7-digits-filter" onclick="onFilterChanged()">
-                    <span class="slider round"></span>
-                </label>
-                <label>Pre Punk:</label>
-                <label class="switch">
-                    <input type="checkbox" id="pre-punk-filter" onclick="onFilterChanged()">
-                    <span class="slider round"></span>
-                </label>
-                <label id="palindrome-filter-label">Palindrome:</label>
-                <label class="switch" id="palindrome-filter-switch">
-                    <input type="checkbox" id="palindrome-filter" onclick="onFilterChanged()">
-                    <span class="slider round"></span>
-                </label>
-                <label id="buy-now-filter-label">Buy Now:</label>
-                <label class="switch" id="buy-now-filter-switch">
-                    <input type="checkbox" id="buy-now-filter" onclick="onFilterChanged()">
-                    <span class="slider round"></span>
-                </label>
-                <label id="sort-by-price-label">Sort by price:</label>
-                <label class="switch" id="sort-by-price-switch">
-                    <input type="checkbox" id="sort-by-price" onclick="sortDigitList()">
-                    <span class="slider round"></span>
-                </label>
+                <div class="filter">
+                    <label>7 Digits</label>
+                    <label class="switch">
+                        <input type="checkbox" id="7-digits-filter" onclick="onFilterChanged()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="filter">
+                    <label>Pre Punk:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="pre-punk-filter" onclick="onFilterChanged()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="filter">
+                    <label id="palindrome-filter-label">Palindrome:</label>
+                    <label class="switch" id="palindrome-filter-switch">
+                        <input type="checkbox" id="palindrome-filter" onclick="onFilterChanged()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="filter">
+                    <label id="buy-now-filter-label">Buy Now:</label>
+                    <label class="switch" id="buy-now-filter-switch">
+                        <input type="checkbox" id="buy-now-filter" onclick="onFilterChanged()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="list-length-info">
+                    <label>0 Item</label>
+                </div>
+                <div class="sorting">
+                    <label id="sort-by-price-label">Sort by price:</label>
+                    <label class="switch" id="sort-by-price-switch">
+                        <input type="checkbox" id="sort-by-price" onclick="sortDigitList()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
-            <div class="list-length-info">0 Item</div>
             <div class="digit-list"></div>
             <div class="sales-list"></div>
             <p class="footer">Made with ❤️ - This is a personal hobby project, please use the tool at your own risk!</p>
         </div>
 
         <script>
-            const LOCAL_STORAGE_VERSION = 49;
+            const LOCAL_STORAGE_VERSION = 50;
             const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
             const SALES_CACHE_INVALIDATION_TIME = 300*1000;
             const PRE_PUNK_CUT_OFF = 506;
@@ -78,7 +90,7 @@
 
             const SALES_API_URL = "https://api.reservoir.tools/sales/bulk/v1?contract=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85";
             const SALES_API_LIMIT = 1000;
-            const SALES_TIME_WINDOW = 6;
+            const SALES_TIME_WINDOW = 5;
 
             const ITEMS_VIEW = "itemview";
             const SALES_VIEW = "salesview";
@@ -100,6 +112,7 @@
                     $("#sort-by-price-switch").show();
                     $("#buy-now-filter-label").show();
                     $("#buy-now-filter-switch").show();
+                    $(".list-length-info").show();
                     $(".digit-list").show();
                     $(".sales-list").hide();
                     activeTab = ITEMS_VIEW;
@@ -119,6 +132,7 @@
                     $("#sort-by-price-switch").hide();
                     $("#buy-now-filter-label").hide();
                     $("#buy-now-filter-switch").hide();
+                    $(".list-length-info").hide();
                     $(".digit-list").hide();
                     $(".sales-list").show();
                     activeTab = SALES_VIEW;

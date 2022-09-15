@@ -62,6 +62,7 @@ body {
 .digit-list {
     color: white;
     font-size: 17px;
+    clear:both;
 }
 
 .digit {
@@ -100,21 +101,30 @@ body {
 }
 
 .filter-container {
-    padding-top: 50px;
+    padding-top: 40px;
+    clear:both;
+    font-size: 15px;
+    color: white;   
 }
 
-.filter-container label {
-    margin-left: 4px;
-    font-size: 15px;
-    color: white;
+.filter {
+    float:left;
+    margin-left: 14px;
 }
 
 .list-length-info {
-    color: white;
+    float:left;
+    clear:left;
     margin-left: 10px;
     margin-top: 20px;
-    font-size: 14px;
-    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.sorting {
+    float:right;
+    margin-top: 20px;
+    margin-left: 4px;
+    margin-bottom: 10px;
 }
 
 .sort-switch{
@@ -186,7 +196,8 @@ input:checked + .slider:before {
 .sales-list {
     color: white;
     font-size: 17px;
-    padding-top: 20px;
+    padding-top: 10px;
+    clear:both;
 }
 
 .sale {
@@ -218,8 +229,7 @@ input:checked + .slider:before {
 
 .nav-container {
     margin: auto;
-    margin-top:60px;
-    margin-bottom: 40px;
+    margin-top:40px;
     width:200px;
 }
 
