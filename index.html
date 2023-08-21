@@ -21,7 +21,7 @@
         
         <title>OG Digits Club</title>
     </head>
-    <body onload="loadDigits();">
+    <body onload="load();">
         <div class="container">
             <div class="toptitle">
                 <h1>OG Digits Club</h1>
@@ -73,6 +73,9 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
+                <div class="refresh">
+                    <a class="refresh-button" id="refresh-button" onclick="fetchSales()" href="#">⟳</a>
+                </div>
             </div>
             <div class="digit-list"></div>
             <div class="sales-list"></div>
@@ -80,9 +83,9 @@
         </div>
 
         <script>
-            const LOCAL_STORAGE_VERSION = 82;
-            const TOKENS_CACHE_INVALIDATION_TIME = 300*1000;
-            const SALES_CACHE_INVALIDATION_TIME = 300*1000;
+            const LOCAL_STORAGE_VERSION = 59;
+            const TOKENS_CACHE_INVALIDATION_TIME = 300*1000; //5 minutes
+            const SALES_CACHE_INVALIDATION_TIME = 30*1000; //30 seconds
             const PRE_PUNK_CUT_OFF = 506;
             
             const TOKEN_API_URL = "https://api.reservoir.tools/tokens/v4";
@@ -90,7 +93,8 @@
 
             const SALES_API_URL = "https://api.reservoir.tools/sales/bulk/v1?contract=0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85";
             const SALES_API_LIMIT = 1000;
-            const SALES_TIME_WINDOW = 5;
+            const SALES_TIME_WINDOW = 12*60*60*1000; //12 hours
+            const SALES_TIME_WINDOW_PER_CALL = 60*60*1000; //1 hour
 
             const ITEMS_VIEW = "itemview";
             const SALES_VIEW = "salesview";
@@ -102,8 +106,15 @@
 
             var activeTab = ITEMS_VIEW;
 
+            var pendingSalesAPICalls = 0;
+
+            function load(){
+                $("#refresh-button").hide();
+                loadDigits();
+            }
+
             function navItems(){
-                if (activeTab != ITEMS_VIEW){
+                if (activeTab != ITEMS_VIEW && pendingSalesAPICalls==0){
                     $("#items-button").removeClass("nav-button");
                     $("#sales-button").removeClass("nav-button-active");
                     $("#items-button").addClass("nav-button-active");
@@ -112,6 +123,7 @@
                     $("#sort-by-price-switch").show();
                     $("#buy-now-filter-label").show();
                     $("#buy-now-filter-switch").show();
+                    $("#refresh-button").hide();
                     $(".list-length-info").show();
                     $(".digit-list").show();
                     $(".sales-list").hide();
@@ -132,6 +144,7 @@
                     $("#sort-by-price-switch").hide();
                     $("#buy-now-filter-label").hide();
                     $("#buy-now-filter-switch").hide();
+                    $("#refresh-button").show();
                     $(".list-length-info").hide();
                     $(".digit-list").hide();
                     $(".sales-list").show();
@@ -143,17 +156,17 @@
 
             function loadDigits(){
 
-                if (localStorage.version == null || localStorage.version < LOCAL_STORAGE_VERSION){
+                if (Number(localStorage.getItem("version")) < LOCAL_STORAGE_VERSION){
                     localStorage.clear();
                     console.log("localStorage cleared");
-                    localStorage.version = LOCAL_STORAGE_VERSION;
+                    localStorage.setItem("version", LOCAL_STORAGE_VERSION);
                 }
 
-                if (localStorage.digits == null){
+                if (localStorage.getItem("digits") == null){
                     fetchDigits();
                 }
                 else{
-                    digits = JSON.parse(localStorage.digits);
+                    digits = JSON.parse(localStorage.getItem("digits"));
                     renderDigitList();
                 }
             }
@@ -175,8 +188,8 @@
                     digits[digitNameHash].palindrome = (digitName == digitName.split('').reverse().join(''));
                 }
 
-                localStorage.pricesUpdatedAt = -1;
-                localStorage.digits = JSON.stringify(digits);
+                localStorage.setItem("pricesUpdatedAt", -1);
+                localStorage.setItem("digits", JSON.stringify(digits));
 
                 renderDigitList();
             }
@@ -207,7 +220,7 @@
             }
 
             function fetchTokenPrices(){
-                if (Date.now() - localStorage.pricesUpdatedAt > TOKENS_CACHE_INVALIDATION_TIME){
+                if ((Date.now() - Number(localStorage.getItem("pricesUpdatedAt"))) > TOKENS_CACHE_INVALIDATION_TIME){
                     var parameters = "";
                     var count = 0;
 
@@ -259,46 +272,59 @@
                     $("#digit-"+nameHash+" > .digit-marketplacelink > a > img").attr("src", getMarketplaceLogo(digits[nameHash].marketplace));
                 }
 
-                localStorage.pricesUpdatedAt = Date.now();
-                localStorage.digits = JSON.stringify(digits);
+                localStorage.setItem("pricesUpdatedAt", Date.now());
+                localStorage.setItem("digits", JSON.stringify(digits));
             }
 
             function loadSalesHistory(){
-                if (localStorage.sales == null){
+                if (localStorage.getItem("sales") == null){
                     fetch("./sales.json")
                     .then(response => response.json())
                     .then(jsonData => storeSalesHistory(jsonData));
                 }
                 else{
-                    sales = JSON.parse(localStorage.sales);
+                    sales = JSON.parse(localStorage.getItem("sales"));
                     fetchSales();
                 }
             }
 
             function storeSalesHistory(jsonData){
                 sales = jsonData[0];
-                localStorage.sales = JSON.stringify(sales);
-                localStorage.salesUpdatedAt = -1;
+                localStorage.setItem("sales", JSON.stringify(sales));
+                localStorage.setItem("salesUpdatedAt", -1);
 
                 fetchSales();
             }
 
             function fetchSales(){
-                if (Date.now() - localStorage.salesUpdatedAt > SALES_CACHE_INVALIDATION_TIME){
+                pendingSalesAPICalls = 0;
+                if ((Date.now() - Number(localStorage.getItem("salesUpdatedAt"))) > SALES_CACHE_INVALIDATION_TIME){
                     console.log("fetching sales");
-                    for (let hour=0;hour<SALES_TIME_WINDOW;hour++){
-                        const startTimestamp = Math.round(Date.now() / 1000) - (hour+1)*60*60;
-                        const endTimestamp = Math.round(Date.now() / 1000) - (hour)*60*60;
+                    const salesUpdateTimestamp = Math.round(Date.now());
+                    var startTimestamp = salesUpdateTimestamp - SALES_TIME_WINDOW;
+                    if (Number(localStorage.getItem("salesUpdatedAt")) > startTimestamp){
+                        startTimestamp = Number(localStorage.getItem("salesUpdatedAt"));
+                    }
+
+                    while (startTimestamp < salesUpdateTimestamp){
+                        var endTimestamp = startTimestamp + SALES_TIME_WINDOW_PER_CALL;
+                        if (endTimestamp > salesUpdateTimestamp){
+                            endTimestamp = salesUpdateTimestamp;
+                        }
                         fetchSalesFor(startTimestamp, endTimestamp);
+                        pendingSalesAPICalls++;
+                        startTimestamp = endTimestamp;
                     }
                 }
-                else{
+
+                if (pendingSalesAPICalls == 0){
                     renderSalesList();
                 }
             }
 
             function fetchSalesFor(startTimestamp, endTimestamp){
-                const url = SALES_API_URL + "&startTimestamp=" + startTimestamp + "&endTimestamp=" + endTimestamp + "&limit=" + SALES_API_LIMIT;
+                console.log("fetching sales for: "+startTimestamp+" - "+endTimestamp);
+                const url = SALES_API_URL + "&startTimestamp=" + Math.round(startTimestamp/1000) + "&endTimestamp=" + Math.round(endTimestamp/1000) + "&limit=" + SALES_API_LIMIT;
                 fetch(url)
                     .then(response => response.json())
                     .then(data => findDigitSales(data));
@@ -317,11 +343,17 @@
                         sales[saleHash] = sale;
                     }
                 }
-
-                localStorage.salesUpdatedAt = Date.now();
-                localStorage.sales = JSON.stringify(sales);
+                
+                localStorage.setItem("sales", JSON.stringify(sales));
 
                 renderSalesList();
+
+                pendingSalesAPICalls--;
+                console.log("pending: "+pendingSalesAPICalls);
+                if (pendingSalesAPICalls == 0){
+                    console.log("fetching sales done");
+                    localStorage.setItem("salesUpdatedAt", Date.now());
+                }
             }
 
             function renderSalesList(){
@@ -541,6 +573,7 @@
                 }
                 return timeLabel;
             }
+
         </script>
     </body>
 </html>

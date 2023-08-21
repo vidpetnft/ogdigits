@@ -112,6 +112,11 @@ body {
     margin-left: 14px;
 }
 
+.refresh {
+    float:right;
+    margin-right: 4px;
+}
+
 .list-length-info {
     float:left;
     clear:left;
@@ -255,6 +260,30 @@ input:checked + .slider:before {
 }
 
 .nav-button:hover{
+    background-color: grey;
+}
+
+.refresh-button{
+    color:white;
+    background-color: black;
+    float:left;
+    text-align: center;
+    font-size: 20px;
+    text-decoration: none;
+    width:20px;
+}
+
+.refresh-button-active{
+    background-color: white;
+    color:black;
+    float:left;
+    text-align: center;
+    font-size: 20px;
+    text-decoration: none;
+    width:20px;
+}
+
+.refresh-button:hover{
     background-color: grey;
 }
 
